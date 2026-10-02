@@ -12,3 +12,10 @@ export const ADMIN_PATH = "/admin";
  * authenticator app, and every sign-in after that needs the password and a 6-digit code.
  */
 export const TEMP_ADMIN_2FA_OFF = true;
+
+/**
+ * TEMPORARY, at the owner's request while the site is being built: the panel password when
+ * ADMIN_PASSWORD isn't set in Vercel. Anyone who can read this repository can read it, so
+ * remove it and set a strong ADMIN_PASSWORD before launch.
+ */
+export const TEMP_ADMIN_PASSWORD = "admin123";

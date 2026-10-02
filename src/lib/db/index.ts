@@ -11,7 +11,7 @@ type Db = Awaited<ReturnType<typeof connect>>;
  * DATABASE_URL, or the same variable under a custom prefix chosen when connecting Neon in
  * Vercel (e.g. ORCstorage_URL or ORCstorage_DATABASE_URL). Direct, unpooled URLs are skipped.
  */
-function databaseUrl() {
+export function databaseUrl() {
   if (process.env.DATABASE_URL) return process.env.DATABASE_URL;
   const candidates = Object.entries(process.env).filter(
     ([key, value]) => /_URL$/i.test(key) && !/UNPOOLED|NON_POOLING|PRISMA/i.test(key) && /^postgres(ql)?:\/\//.test(value ?? ""),

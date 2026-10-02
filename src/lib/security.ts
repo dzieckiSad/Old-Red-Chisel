@@ -1,13 +1,18 @@
 import "server-only";
-import { createCipheriv, createDecipheriv, createHmac, randomBytes, randomInt, scrypt, timingSafeEqual } from "node:crypto";
+import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes, randomInt, scrypt, timingSafeEqual } from "node:crypto";
 import { promisify } from "node:util";
+import { databaseUrl } from "@/lib/db";
 
 const scryptAsync = promisify(scrypt) as (pw: string, salt: Buffer, len: number) => Promise<Buffer>;
 
 function secret() {
   const value = process.env.SESSION_SECRET;
   if (value && value.length >= 32) return value;
-  if (process.env.VERCEL) throw new Error("SESSION_SECRET must be set (32+ characters).");
+  // Without SESSION_SECRET, derive one from the database URL: it holds the database password,
+  // so it is just as secret and already set in Vercel. Rotating the database password signs everyone out.
+  const db = databaseUrl();
+  if (db) return createHash("sha256").update(`orc-session-v1:${db}`).digest("base64url");
+  if (process.env.VERCEL) throw new Error("SESSION_SECRET or a database must be set.");
   return "local-development-secret-do-not-use-in-production";
 }
 

@@ -7,8 +7,21 @@ import * as schema from "./schema";
 
 type Db = Awaited<ReturnType<typeof connect>>;
 
+/**
+ * DATABASE_URL, or the same variable under a custom prefix chosen when connecting Neon in
+ * Vercel (e.g. ORCstorage_URL or ORCstorage_DATABASE_URL). Direct, unpooled URLs are skipped.
+ */
+function databaseUrl() {
+  if (process.env.DATABASE_URL) return process.env.DATABASE_URL;
+  const candidates = Object.entries(process.env).filter(
+    ([key, value]) => /_URL$/i.test(key) && !/UNPOOLED|NON_POOLING|PRISMA/i.test(key) && /^postgres(ql)?:\/\//.test(value ?? ""),
+  );
+  const preferred = candidates.find(([key]) => /DATABASE_URL$/i.test(key)) ?? candidates[0];
+  return preferred?.[1];
+}
+
 async function connect() {
-  const url = process.env.DATABASE_URL;
+  const url = databaseUrl();
   if (url) {
     const { neon } = await import("@neondatabase/serverless");
     const { drizzle } = await import("drizzle-orm/neon-http");
@@ -39,7 +52,7 @@ export function getDb(): Promise<Db> {
 }
 
 export function isDatabaseConfigured() {
-  return Boolean(process.env.DATABASE_URL) || !process.env.VERCEL;
+  return Boolean(databaseUrl()) || !process.env.VERCEL;
 }
 
 export { schema };

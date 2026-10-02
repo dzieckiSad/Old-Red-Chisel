@@ -23,6 +23,15 @@
 | Termin | **Jak najszybciej**, MVP w ok. 4–6 tyg. |
 | Budżet utrzymania | **€30–€100 / mies.** |
 
+### Kierunek wyglądu (formularz, 2026-10-02)
+| Temat | Decyzja |
+|---|---|
+| Kolejność | **Najpierw własny zestaw elementów wyglądu**, potem panel administracyjny i płatności |
+| Styl | **Mieszany**: czysty, nowoczesny układ z rzemieślniczymi detalami (ramki, faktury, akcenty) |
+| Animacje | **Subtelne**: płynne pojawianie się sekcji, efekty po najechaniu, suwak przed/po; strona ma pozostać szybka |
+| Ikony i ilustracje | **Ręcznie rysowane**, jak szkice ołówkiem stolarza |
+| Zasada | Wszystkie elementy widoczne na stronie robimy sami (bez gotowych bibliotek UI/ikon); gotowe tylko po przeróbce |
+
 ### Konsekwencje dla projektu
 - **Kuchnie** stają się osobną, mocną kategorią w *Bespoke* (wysoka wartość zlecenia). Na stronie głównej powinny być widoczne obok szaf wnękowych.
 - **SEO lokalne** skupione na Midlands: „carpenter Athlone”, „fitted wardrobes Westmeath”, „kitchens Athlone”, „renovations Roscommon”. Strony lokalne: Athlone, Mullingar, Roscommon, Longford, Tullamore, Ballinasloe (do potwierdzenia).

@@ -1,8 +1,53 @@
 # Old Red Chisel — plan strony i sklepu
 
-> Status: **wersja robocza planu (v0.1)**, 2026-10-02.
+> Status: **plan v0.2, decyzje podjęte**, 2026-10-02.
 > Firma: stolarka + budownictwo/wykończenia, Irlandia.
 > Cel: jedna strona, która **sprzedaje gotowe produkty**, **przyjmuje zamówienia na wymiar** i **zbiera zapytania o usługi budowlane**.
+
+---
+
+## 0. Decyzje (z formularza, 2026-10-02)
+
+| Temat | Decyzja |
+|---|---|
+| Nazwa / logo | **Old Red Chisel**, logo już jest (do przesłania) |
+| Zasięg | **Athlone i okolice** (Westmeath, Roscommon, Longford, Offaly — do doprecyzowania promienia) |
+| Kuchnie | **Tak, pełne kuchnie na wymiar** (projekt, produkcja, montaż) |
+| Język | **Tylko angielski** |
+| Sklep na start | Szafki nocne, bary domowe, szafki/komody/RTV, półki i drobne akcesoria |
+| Magazyn | **Mieszany**: część od ręki (tryb A), część na zamówienie (tryb B) |
+| Dostawa | **Własny transport**, montaż **płatny osobno**, **odbiór z warsztatu** w Athlone |
+| Pomiar | **Płatny, odliczany od zamówienia** |
+| Technologia | **Własna strona: Next.js + Payload CMS + Stripe** |
+| Materiały | Zdjęcia przed/po: później · Facebook: jest (link wkrótce) · **Domena: do kupienia** · **Google Business Profile: do założenia** |
+| Termin | **Jak najszybciej**, MVP w ok. 4–6 tyg. |
+| Budżet utrzymania | **€30–€100 / mies.** |
+
+### Konsekwencje dla projektu
+- **Kuchnie** stają się osobną, mocną kategorią w *Bespoke* (wysoka wartość zlecenia). Na stronie głównej powinny być widoczne obok szaf wnękowych.
+- **SEO lokalne** skupione na Midlands: „carpenter Athlone”, „fitted wardrobes Westmeath”, „kitchens Athlone”, „renovations Roscommon”. Strony lokalne: Athlone, Mullingar, Roscommon, Longford, Tullamore, Ballinasloe (do potwierdzenia).
+- **Strefy dostawy** liczone od warsztatu w Athlone (np. do 30 km / 30–60 km / 60+ km lub wg hrabstw), plus darmowy odbiór z warsztatu.
+- **Pomiar płatny**: w kreatorze wyceny jest krok „Book a survey”. Opłata pobierana przez Stripe, później automatycznie odliczana od zaliczki.
+- **Brak zdjęć na start**: projekt graficzny z miejscami na zdjęcia. Do czasu sesji zdjęciowej korzystamy z tymczasowych zdjęć warsztatu/drewna, a portfolio uruchamiamy, gdy przyjdą zdjęcia przed/po.
+
+### Infrastruktura w budżecie €30–€100 / mies.
+| Element | Usługa | Koszt orientacyjny |
+|---|---|---|
+| Hosting aplikacji | Vercel (Pro, gdy ruch wzrośnie) lub Railway | €0–€20 |
+| Baza danych | PostgreSQL (Neon / Supabase) | €0–€20 |
+| Zdjęcia | Cloudflare R2 | ~€0–€5 |
+| E-maile transakcyjne | Resend | €0–€20 |
+| Domena | .ie lub .com | ~€15–€30 / rok |
+| Płatności | Stripe | brak abonamentu, prowizja od transakcji |
+
+### Do zrobienia po Twojej stronie
+- [ ] Przesłać **logo** (najlepiej SVG lub PNG w wysokiej rozdzielczości) + kolory, jeśli są ustalone
+- [ ] Kupić **domenę** (propozycje: `oldredchisel.ie`, `oldredchisel.com`)
+- [ ] Założyć **Google Business Profile** (adres warsztatu w Athlone)
+- [ ] Podać **link do Facebooka**
+- [ ] Lista produktów startowych: nazwa, wymiary, drewno/wykończenia, cena, czy jest na stanie
+- [ ] Zdjęcia przed/po (gdy będą)
+- [ ] Założyć konto **Stripe** (firma, IBAN) — potrzebne przed startem płatności
 
 ---
 
@@ -26,7 +71,7 @@ Te trzy ścieżki **wzajemnie się napędzają**: klient, który kupił szafkę 
 - **Duże i małe projekty** — nie odsyłamy klienta z małym zleceniem.
 - **Przejrzystość** — ceny „od”, jasny proces, terminy, gwarancja.
 
-> Nazwa robocza: **Old Red Chisel** (zgodna z nazwą repozytorium). Do potwierdzenia — patrz pytania w sekcji 12.
+> Nazwa: **Old Red Chisel** (potwierdzona).
 
 ---
 
@@ -54,7 +99,7 @@ Home
 │   ├── Fitted wardrobes (szafy wnękowe / garderoby)
 │   ├── Alcove & media units (zabudowy wnęk, TV)
 │   ├── Under-stairs & attic storage (pod schodami, poddasza)
-│   ├── Kitchens & utility rooms (jeśli robicie — do potwierdzenia)
+│   ├── Kitchens & utility rooms (kuchnie na wymiar: projekt, produkcja, montaż)
 │   ├── Home office, bathroom vanity, inne
 │   └── Configurator / „Zaprojektuj swoją szafę” (faza 2)
 ├── Build & Renovate / Budowa i wykończenia
@@ -227,7 +272,6 @@ Proponowany stos:
 - [ ] Prosty konfigurator szafy (szerokość/wysokość/drzwi/wnętrze → orientacyjna cena)
 - [ ] Strony lokalne (hrabstwa), poradnik/blog
 - [ ] Raty, program poleceń, newsletter
-- [ ] Wersja polska (opcjonalnie)
 
 ### Faza 3 — Pełna platforma
 - [ ] Konto klienta ze statusem projektu (pomiar → projekt → produkcja → montaż) i dokumentami
@@ -248,7 +292,7 @@ Proponowany stos:
 
 ---
 
-## 12. Pytania do Ciebie (potrzebne, żeby przejść do projektu i kodu)
+## 12. Pytania do Ciebie — ✅ odpowiedziane (patrz sekcja 0)
 
 1. **Nazwa firmy i logo** — czy „Old Red Chisel” to docelowa nazwa? Masz już logo/kolory?
 2. **Lokalizacja i zasięg** — gdzie jest warsztat i w których hrabstwach pracujecie?

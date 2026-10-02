@@ -39,7 +39,9 @@ export function Footer() {
           <Logo variant="dark" width={200} />
           <p className="mt-5 max-w-xs text-sm">{site.description}</p>
           <p className="mt-4 text-sm">
-            {site.address.locality}, {site.address.county}
+            {site.address.street}, {site.address.locality}, {site.address.county}
+            <br />
+            {site.hours}
             <br />
             <a href={site.phoneHref} className="hover:text-white">
               {site.phone}

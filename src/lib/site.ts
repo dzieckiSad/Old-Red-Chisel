@@ -5,15 +5,18 @@ export const site = {
   description:
     "Handmade joinery, bespoke kitchens and fitted wardrobes, and complete home renovations from our workshop in Athlone.",
   url: "https://www.oldredchisel.ie", // TODO: confirm once the domain is bought
-  phone: "+353 00 000 0000", // TODO
-  phoneHref: "tel:+353000000000", // TODO
-  whatsappHref: "https://wa.me/353000000000", // TODO
-  email: "hello@oldredchisel.ie", // TODO
+  phone: "089 492 8771",
+  phoneHref: "tel:+353894928771",
+  whatsappHref: "https://wa.me/353894928771",
+  email: "oldredchisel@gmail.com",
   address: {
+    street: "Golden Island",
     locality: "Athlone",
     county: "Co. Westmeath",
     country: "Ireland",
   },
+  hours: "Mon – Fri, 9:00 – 17:30",
+  mapsHref: "https://maps.app.goo.gl/boCn4FWCBCWbT2wEA?g_st=ic",
   serviceArea: ["Athlone", "Westmeath", "Roscommon", "Longford", "Offaly", "East Galway"],
   social: {
     facebook: "", // TODO: add Facebook page URL

@@ -95,6 +95,11 @@ export function verifyToken<T extends Record<string, unknown>>(token: string | u
   }
 }
 
+/** HMAC of `value` under the session secret: lets us compare a value without storing it. */
+export function keyedDigest(label: string, value: string) {
+  return createHmac("sha256", secret()).update(`${label}:${value}`).digest("base64url");
+}
+
 export function safeEqual(a: string, b: string) {
   const x = createHmac("sha256", "cmp").update(a).digest();
   const y = createHmac("sha256", "cmp").update(b).digest();

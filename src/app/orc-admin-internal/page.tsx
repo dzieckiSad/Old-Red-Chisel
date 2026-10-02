@@ -1,13 +1,11 @@
 import Link from "next/link";
-import QRCode from "qrcode";
-import { LoginForm, SetupForm } from "@/components/admin/forms";
+import { LoginForm } from "@/components/admin/forms";
 import { SketchIcon } from "@/components/sketch/icons";
-import { adminBase, adminConfigIssues, adminCount, currentAdmin } from "@/lib/admin-auth";
+import { adminBase, adminConfigIssues, currentAdmin } from "@/lib/admin-auth";
 import { TEMP_ADMIN_2FA_OFF } from "@/lib/admin-config";
 import type { OrderStatus } from "@/lib/db/schema";
 import { listOrders } from "@/lib/orders";
 import { deliveryLabels, formatCents, formatDate, statusLabels } from "@/lib/order-status";
-import { newTotpSecret, seal, totpUri } from "@/lib/security";
 
 const filters: { key: string; label: string; statuses?: OrderStatus[] }[] = [
   { key: "open", label: "To do", statuses: ["paid", "in_production", "ready", "out_for_delivery", "ready_for_collection"] },
@@ -20,29 +18,7 @@ export default async function AdminHome({ searchParams }: PageProps<"/orc-admin-
   const base = await adminBase();
   if (adminConfigIssues().length) return null; // the layout shows what's missing
 
-  if ((await adminCount()) === 0) {
-    if (!process.env.ADMIN_SETUP_KEY) {
-      return <Card title="Admin not set up">Add ADMIN_SETUP_KEY in the Vercel environment variables, redeploy, then reload this page.</Card>;
-    }
-    let twoFactor = null;
-    if (!TEMP_ADMIN_2FA_OFF) {
-      const secret = newTotpSecret();
-      const qrSvg = await QRCode.toString(totpUri(secret, "admin"), { type: "svg", margin: 0, color: { dark: "#24201d", light: "#ffffff" } });
-      twoFactor = { sealed: seal(secret), qrSvg, secret };
-    }
-    return (
-      <Card title="Set up the admin account" icon="shield">
-        <p className="mb-6 text-sm text-graphite">
-          This page only works once.{" "}
-          {TEMP_ADMIN_2FA_OFF ? "While the site is being built, signing in needs only your email and password." : "After this, signing in needs your password and a code from the app."}
-        </p>
-        <SetupForm twoFactor={twoFactor} />
-      </Card>
-    );
-  }
-
-  const admin = await currentAdmin();
-  if (!admin) {
+  if (!(await currentAdmin())) {
     return (
       <Card title="Sign in" icon="shield">
         <LoginForm twoFactor={!TEMP_ADMIN_2FA_OFF} />

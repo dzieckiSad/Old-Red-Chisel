@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const base = await adminBase();
   const issues = adminConfigIssues();
-  const admin = issues.length ? null : await currentAdmin();
+  const admin = issues.length ? false : await currentAdmin();
   return (
     <div className="min-h-full bg-sand/50">
       <header className="border-b border-line bg-ink text-white">
@@ -26,12 +26,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <nav className="flex items-center gap-1 text-sm font-semibold">
               <Link href={base} className="px-3 py-1.5 hover:bg-white/10">Orders</Link>
               <Link href={`${base}/products`} className="px-3 py-1.5 hover:bg-white/10">Products</Link>
-              <Link href={`${base}/team`} className="px-3 py-1.5 hover:bg-white/10">Team</Link>
             </nav>
           )}
           {admin && (
             <form action={logoutAdmin} className="flex items-center gap-4 text-sm">
-              <span className="hidden text-white/70 sm:inline">{admin.email}</span>
               <button type="submit" className="font-semibold hover:text-brand">Sign out</button>
             </form>
           )}

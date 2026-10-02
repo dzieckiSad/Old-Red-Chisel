@@ -7,8 +7,8 @@ export const ADMIN_INTERNAL = "/orc-admin-internal";
 export const ADMIN_PATH = "/admin";
 
 /**
- * TEMPORARY, at the owner's request while the site is being built: sign-in with password
- * only, no authenticator code. Set to false before launch; each admin then adds the
- * authenticator app on their next sign-in.
+ * TEMPORARY, at the owner's request while the site is being built: sign-in with the panel
+ * password only. Set to false before launch; the panel then shows a QR code once for the
+ * authenticator app, and every sign-in after that needs the password and a 6-digit code.
  */
 export const TEMP_ADMIN_2FA_OFF = true;

@@ -29,7 +29,7 @@ npm run lint
 
 - **Checkout** (`/checkout`): no customer accounts. Prices are recalculated on the server; card payment uses Stripe's Payment Element styled to match the site.
 - After payment the customer gets an **order number and password** on screen and by email, and uses them at **`/track`** to follow the order.
-- **Admin panel**: served only at the secret `ADMIN_PATH` (rewritten in `src/proxy.ts`); the internal route answers 404. Sign-in needs password + authenticator code.
+- **Admin panel**: served at the secret `ADMIN_PATH` (rewritten in `src/proxy.ts`), which shows 404 until the browser has a one-time pass from `npm run admin`; the internal route always answers 404. Sign-in needs password + authenticator code. Temporarily also at `/admin` during development (`src/lib/admin-config.ts`).
 - Data lives in Postgres (Neon in production, embedded PGlite in `.data/` locally).
 
 Setup of the services and environment variables: [`docs/SETUP.md`](docs/SETUP.md) and [`.env.example`](.env.example).

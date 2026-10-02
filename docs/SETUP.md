@@ -7,7 +7,7 @@ Po każdej zmianie zmiennych: **Deployments → ⋯ → Redeploy**.
 Dopóki czegoś brakuje, strona działa bezpiecznie:
 - bez bazy danych i Stripe sklep pokazuje „Online payment opens soon” i numer telefonu,
 - bez kluczy Stripe przycisk testowej płatności działa tylko lokalnie, nigdy w Vercelu,
-- bez `ADMIN_PATH` panel admina w ogóle nie istnieje (każdy adres daje 404).
+- panel admina działa tylko z bazą danych i ustawionymi kluczami (punkt 5).
 
 ## 1. Baza danych (Neon, darmowa)
 1. Vercel → projekt → **Storage → Create Database → Neon (Serverless Postgres)** → plan Free → region **Europe (Frankfurt lub London)**.
@@ -39,20 +39,50 @@ W trybie testowym płacisz kartą `4242 4242 4242 4242`, dowolna przyszła data 
 Bez własnej domeny Resend wysyła tylko na Twój własny adres (do testów).
 
 ## 5. Panel admina
-1. Wymyśl tajny adres, np. `warsztat-7k2q-mf9x` (12+ znaków: litery, cyfry, `-`), i wpisz jako `ADMIN_PATH`.
-   Nie zapisuj go w kodzie ani w repozytorium.
-2. Wpisz `ADMIN_SETUP_KEY`: losowe 16+ znaków (potrzebne tylko raz).
-3. Redeploy, potem otwórz `https://oldredchisel.vercel.app/<ADMIN_PATH>`.
-4. Zainstaluj w telefonie **Google Authenticator** lub **Microsoft Authenticator**.
-5. Na stronie konfiguracji: wpisz klucz z punktu 2, swój e-mail, hasło (12+ znaków),
-   zeskanuj kod QR aplikacją i wpisz 6 cyfr z aplikacji.
-6. Od teraz logujesz się: e-mail + hasło + kod z aplikacji. Sesja wygasa po 8 godzinach.
 
-Bezpieczeństwo panelu:
-- adres panelu jest tylko w Vercelu; adresy `/admin` i wewnętrzny adres w kodzie zwracają 404,
-- hasło jest zaszyfrowane (scrypt), sekret aplikacji 2FA też jest zaszyfrowany w bazie,
-- po 5 błędnych próbach logowania na e-mail (10 na adres IP) blokada na 15 minut,
-- ciasteczko sesji działa tylko pod tajnym adresem,
+Logowanie zawsze wymaga **e-maila, hasła i 6-cyfrowego kodu** z aplikacji w telefonie
+(Google Authenticator lub Microsoft Authenticator). Do panelu prowadzą dwie drogi:
+
+### Teraz, w trakcie budowy: prosty adres
+`https://oldredchisel.vercel.app/admin`. Tymczasowe, na Twoją prośbę. Przed startem strony zostanie
+wyłączone (jedna linia w `src/lib/admin-config.ts`) i zostanie tylko wejście z terminala.
+
+### Docelowo: tylko z terminala na Twoim PC
+Tajny adres panelu bez przepustki pokazuje zwykłe 404. Przepustkę daje polecenie `npm run admin`
+uruchomione na Twoim komputerze: tworzy jednorazowy link ważny 2 minuty i otwiera przeglądarkę.
+Przepustka działa w tej przeglądarce 12 godzin; potem logujesz się hasłem i kodem z aplikacji.
+
+### Ustawienia w Vercelu (Environment Variables)
+| Nazwa | Wartość |
+|---|---|
+| `SESSION_SECRET` | losowe 40+ znaków (punkt 2) |
+| `ADMIN_SETUP_KEY` | losowe 16+ znaków, potrzebne raz przy zakładaniu konta |
+| `ADMIN_PATH` | tajny adres panelu, np. `warsztat-7k2q-mf9x` (12+ znaków: litery, cyfry, `-`) |
+| `ADMIN_ACCESS_KEY` | losowe 32+ znaków, klucz do podpisywania przepustek z terminala |
+
+Do prostego adresu `/admin` wystarczą `SESSION_SECRET`, `ADMIN_SETUP_KEY` i **baza danych (punkt 1)**.
+
+### Pierwsze uruchomienie
+1. Ustaw zmienne, zrób Redeploy, otwórz `/admin`.
+2. Wpisz `ADMIN_SETUP_KEY`, swój e-mail i hasło (12+ znaków).
+3. Zeskanuj kod QR aplikacją w telefonie i wpisz 6 cyfr. Konto można założyć tylko raz.
+
+### Wejście z terminala (PC)
+Jednorazowo na komputerze: zainstaluj Node.js (20+) i Git, pobierz repozytorium
+(`git clone …`, `npm install`), a obok `package.json` utwórz plik `.env.admin`:
+```
+ADMIN_SITE_URL=https://oldredchisel.vercel.app
+ADMIN_PATH=<ten sam co w Vercelu>
+ADMIN_ACCESS_KEY=<ten sam co w Vercelu>
+```
+Potem za każdym razem: `npm run admin`. Plik `.env.admin` nie trafia do repozytorium.
+
+### Zabezpieczenia panelu
+- adres wewnętrzny z kodu oraz tajny adres bez przepustki zwracają 404,
+- przepustka jest podpisana kluczem, ważna 2 minuty i działa tylko raz,
+- hasło zaszyfrowane (scrypt), sekret aplikacji 2FA zaszyfrowany w bazie,
+- po 5 błędnych logowaniach na e-mail (10 na adres IP) blokada na 15 minut,
+- sesja wygasa po 8 godzinach, ciasteczka działają tylko pod adresem panelu,
 - **repozytorium ustaw jako prywatne** (GitHub → Settings → Danger Zone → Change visibility).
 
 ## Jak działa zamówienie (dla klienta)

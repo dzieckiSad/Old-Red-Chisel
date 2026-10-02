@@ -17,7 +17,8 @@ Zmiana hasła wylogowuje wszystkich. Przy starcie sklepu usuń `SITE_PASSWORD` i
 
 ## 1. Baza danych (Neon, darmowa)
 1. Vercel → projekt → **Storage → Create Database → Neon (Serverless Postgres)** → plan Free → region **Europe (Frankfurt lub London)**.
-2. Połącz z projektem `orc` (wszystkie środowiska). Vercel sam doda `DATABASE_URL`.
+2. Połącz z projektem `orc` (wszystkie środowiska). Vercel sam doda `DATABASE_URL`
+   (jeśli w polu **Custom Prefix** wpiszesz własną nazwę, np. `ORCstorage`, strona i tak znajdzie bazę).
 3. Tabele tworzą się same przy pierwszym uruchomieniu.
 
 ## 1b. Zdjęcia produktów (Vercel Blob, darmowy limit na start)

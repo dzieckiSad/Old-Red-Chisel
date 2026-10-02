@@ -27,7 +27,8 @@ Zmiana hasła wylogowuje wszystkich. Przy starcie sklepu usuń `SITE_PASSWORD` i
 3. Od teraz zdjęcia dodane w panelu (Products → produkt → Add photos) trafiają do Blob.
 
 ## 2. Sekret sesji
-Dodaj `SESSION_SECRET`: losowy ciąg 40+ znaków (np. z generatora haseł). Nigdy go nie udostępniaj.
+**Opcjonalnie.** Bez niego strona sama tworzy sekret z tajnego adresu bazy danych.
+Jeśli chcesz osobny: dodaj `SESSION_SECRET`, losowy ciąg 40+ znaków (np. z generatora haseł). Nigdy go nie udostępniaj.
 Jego zmiana wyloguje wszystkich i unieważni niewysłane hasła zamówień, więc ustaw raz.
 
 ## 3. Płatności kartą (Stripe)
@@ -58,7 +59,7 @@ Nie ma kont: jest **jeden panel i jedno stałe hasło**, to samo dla Ciebie i sz
 ### Ustawienia w Vercelu (Environment Variables)
 | Nazwa | Wartość |
 |---|---|
-| `SESSION_SECRET` | losowe 40+ znaków (punkt 2) |
+| `SESSION_SECRET` | opcjonalnie, losowe 40+ znaków (punkt 2) |
 | `ADMIN_PASSWORD` | hasło do panelu, 8+ znaków (na czas budowy niepotrzebne, patrz niżej) |
 
 Oraz **baza danych** (punkt 1).

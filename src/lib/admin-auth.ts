@@ -32,8 +32,9 @@ export function adminConfigIssues() {
   if (!isDatabaseConfigured()) {
     issues.push({ name: "Database", how: "Vercel → Storage → Create Database → Neon → connect it to this project." });
   }
-  if (process.env.VERCEL && (process.env.SESSION_SECRET ?? "").length < 32) {
-    issues.push({ name: "SESSION_SECRET", how: "Settings → Environment Variables: any random text of 40+ characters." });
+  const secret = process.env.SESSION_SECRET ?? "";
+  if (secret && secret.length < 32) {
+    issues.push({ name: "SESSION_SECRET", how: "Settings → Environment Variables: make it 40+ random characters, or delete it." });
   }
   if (adminPassword().length < 8) {
     issues.push({ name: "ADMIN_PASSWORD", how: "Settings → Environment Variables: the panel password, 8+ characters." });

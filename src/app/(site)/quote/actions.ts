@@ -1,5 +1,6 @@
 "use server";
 
+import { notifyWorkshopOfQuote } from "@/lib/email";
 import {
   MAX_PHOTOS,
   MAX_PHOTO_BYTES,
@@ -56,9 +57,18 @@ export async function submitQuote(_prev: QuoteState, formData: FormData): Promis
     return { status: "error", message: "Please check the highlighted fields.", fieldErrors };
   }
 
-  // TODO: save the request in the CMS, store photos in object storage and email the workshop.
-  // Until then requests only appear in the server log.
-  console.info("Quote request", { ...request, photos: photos.map((p) => `${p.name} (${p.size} B)`) });
+  // Emailed to the workshop (Admin → Content email) with the photos attached.
+  const label = projectTypes.find((t) => t.value === request.projectType)?.label ?? request.projectType;
+  try {
+    const attachments = await Promise.all(
+      photos.map(async (p, i) => ({ filename: p.name || `photo-${i + 1}.jpg`, content: Buffer.from(await p.arrayBuffer()).toString("base64") })),
+    );
+    const sent = await notifyWorkshopOfQuote({ ...request, projectType: label }, attachments);
+    if (!sent) console.info("Quote request (email not set up)", { ...request, photos: photos.map((p) => `${p.name} (${p.size} B)`) });
+  } catch (err) {
+    console.error("Quote email failed", err, request);
+    return { status: "error", message: "Sorry, we couldn't send your request just now. Please try again, or call or WhatsApp us." };
+  }
 
   return { status: "success", name: request.name.split(" ")[0] };
 }

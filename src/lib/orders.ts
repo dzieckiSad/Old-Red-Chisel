@@ -6,7 +6,7 @@ import { getProduct, takeFromStock } from "@/lib/products";
 import { getDb } from "@/lib/db";
 import { type DeliveryMethod, type OrderItem, type OrderStatus, orderEvents, orders } from "@/lib/db/schema";
 import { getDeliveryZones } from "@/lib/content";
-import { sendOrderCredentialsEmail } from "@/lib/email";
+import { notifyWorkshopOfOrder, sendOrderCredentialsEmail } from "@/lib/email";
 import type { ManualPayment } from "@/lib/order-status";
 import { hashPassword, newOrderCode, newOrderPassword, seal, unseal } from "@/lib/security";
 
@@ -109,6 +109,7 @@ export async function markPaid(orderId: string, paymentRef: string) {
     await db.insert(orderEvents).values({ orderId, status: "paid", note: "Payment received" });
     await takeFromStock(updated.items);
     revalidatePath("/", "layout"); // stock levels on shop pages
+    await notifyWorkshopOfOrder(updated);
   }
   const order = updated ?? (await getOrder(orderId));
   if (order) await emailCredentialsOnce(order);

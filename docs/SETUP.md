@@ -44,12 +44,27 @@ Jego zmiana wyloguje wszystkich i unieważni niewysłane hasła zamówień, wię
 
 W trybie testowym płacisz kartą `4242 4242 4242 4242`, dowolna przyszła data i CVC.
 
-## 4. E-maile z kodem zamówienia (Resend, darmowe do 3000/mies.)
-1. Załóż konto na **resend.com**, dodaj domenę (np. `oldredchisel.ie`) i ustaw rekordy DNS, które pokaże.
-2. **API Keys → Create** → `RESEND_API_KEY`.
-3. `EMAIL_FROM` = np. `Old Red Chisel <orders@oldredchisel.ie>`.
+## 4. E-maile (Resend, darmowe do 3000/mies.)
+Strona wysyła 3 rodzaje maili:
+- **do Ciebie**: o każdym nowym opłaconym zamówieniu (klient, telefon, co kupił, dostawa),
+- **do Ciebie**: o każdym zapytaniu o wycenę, **ze zdjęciami klienta w załączniku** (odpowiadasz zwykłym „Odpowiedz”),
+- **do klienta**: numer i hasło zamówienia po płatności.
+Twoje maile idą na adres z panelu → **Content → Email** (teraz `oldredchisel@gmail.com`).
 
-Bez własnej domeny Resend wysyła tylko na Twój własny adres (do testów).
+### Krok 1: konto i klucz (5 minut, wystarczy do maili do Ciebie)
+1. Wejdź na **resend.com** → **Sign up**. Załóż konto **na ten sam e-mail co w panelu** (`oldredchisel@gmail.com`)
+   i potwierdź go linkiem z maila.
+2. W Resend: **API Keys → Create API Key** → nazwa `orc` → uprawnienie **Sending access** → **Add**. Skopiuj klucz (`re_…`),
+   pokazuje się tylko raz.
+3. Vercel → projekt `orc` → **Settings → Environment Variables** → `RESEND_API_KEY` = skopiowany klucz → **Save** → Redeploy.
+4. Gotowe: maile o zamówieniach i zapytaniach przychodzą do Ciebie. `EMAIL_FROM` na razie **nie ustawiaj**.
+
+### Krok 2: maile do klientów (gdy kupisz domenę)
+Bez własnej domeny Resend dostarcza maile tylko na adres właściciela konta, więc klient jeszcze nie dostanie maila
+(numer i hasło i tak widzi na ekranie po płatności, a panel pozwala wygenerować nowe hasło).
+1. Resend → **Domains → Add Domain** → np. `oldredchisel.ie` → region **Ireland (eu-west-1)**.
+2. U sprzedawcy domeny dodaj rekordy DNS, które pokaże Resend, i poczekaj na **Verified**.
+3. Vercel: `EMAIL_FROM` = `Old Red Chisel <orders@oldredchisel.ie>` → Redeploy.
 
 ## 5. Panel admina
 

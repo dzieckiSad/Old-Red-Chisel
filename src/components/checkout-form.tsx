@@ -10,9 +10,8 @@ import { CornerMarks, PencilNote } from "@/components/sketch/ornaments";
 import { ButtonArrow, PhotoPlaceholder } from "@/components/ui";
 import { cartTotal, useCart } from "@/lib/cart";
 import type { DeliveryMethod } from "@/lib/db/schema";
-import { deliveryZones } from "@/lib/delivery";
+import { type DeliveryZone, servedZones as served } from "@/lib/content-defaults";
 import { formatPrice } from "@/lib/format";
-import { site } from "@/lib/site";
 
 type Mode = "stripe" | "demo" | "off";
 
@@ -47,9 +46,22 @@ const methodOptions: { value: DeliveryMethod; label: string; text: string }[] = 
   { value: "collection", label: "Collect", text: "Free, from our Athlone workshop" },
 ];
 
-const servedZones = deliveryZones.filter((z) => z.delivery !== null && z.delivery > 0);
 
-export function CheckoutForm({ mode, publishableKey, initialError }: { mode: Mode; publishableKey: string; initialError?: string }) {
+export function CheckoutForm({
+  mode,
+  publishableKey,
+  initialError,
+  deliveryZones,
+  site,
+}: {
+  mode: Mode;
+  publishableKey: string;
+  initialError?: string;
+  /** Zones and contact details from the admin panel's Content settings. */
+  deliveryZones: DeliveryZone[];
+  site: { phone: string; phoneHref: string; locality: string };
+}) {
+  const servedZones = served(deliveryZones);
   const cart = useCart();
   const [method, setMethod] = useState<DeliveryMethod>("delivery");
   const [zone, setZone] = useState<string>(servedZones[0]?.name ?? "");
@@ -216,7 +228,7 @@ export function CheckoutForm({ mode, publishableKey, initialError }: { mode: Mod
               ) : (
                 <p className="mt-5 flex items-center gap-3 bg-cream p-4 text-sm text-graphite">
                   <SketchIcon name="clock" size={32} />
-                  We&apos;ll let you know when it&apos;s ready to collect from our workshop in {site.address.locality}.
+                  We&apos;ll let you know when it&apos;s ready to collect from our workshop in {site.locality}.
                 </p>
               )}
               <Field label="Notes for us (optional)" className="mt-5">

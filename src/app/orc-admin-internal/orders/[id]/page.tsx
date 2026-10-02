@@ -16,7 +16,7 @@ export default async function AdminOrderPage({ params }: PageProps<"/orc-admin-i
 
   return (
     <>
-      <Link href={base} className="text-sm font-semibold text-graphite hover:text-ink">← All orders</Link>
+      <Link href={`${base}/orders`} className="text-sm font-semibold text-graphite hover:text-ink">← All orders</Link>
       <div className="mt-3 flex flex-wrap items-baseline justify-between gap-3">
         <h1 className="font-mono text-3xl font-semibold">{order.code}</h1>
         <p className="text-lg font-semibold">{formatCents(order.total)}</p>

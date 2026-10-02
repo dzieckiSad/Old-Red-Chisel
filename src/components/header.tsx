@@ -7,9 +7,9 @@ import { Logo } from "@/components/logo";
 import { SketchIcon } from "@/components/sketch/icons";
 import { Container } from "@/components/ui";
 import { useCart } from "@/lib/cart";
-import { nav, site } from "@/lib/site";
+import { nav } from "@/lib/site";
 
-export function Header() {
+export function Header({ phone, phoneHref }: { phone: string; phoneHref: string }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const cart = useCart();
@@ -24,8 +24,8 @@ export function Header() {
             <Link href="/track" className="hover:text-white">
               Track your order
             </Link>
-            <a href={site.phoneHref} className="hover:text-white">
-              {site.phone}
+            <a href={phoneHref} className="hover:text-white">
+              {phone}
             </a>
           </span>
         </Container>

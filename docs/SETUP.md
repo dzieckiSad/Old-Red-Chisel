@@ -86,6 +86,20 @@ Przed startem zmienimy `TEMP_ADMIN_2FA_OFF` na `false` (`src/lib/admin-config.ts
   na telefonie w menu „…”) → na samym dole **Danger Zone** → **Change visibility** → **Make private** → potwierdź nazwą repozytorium.
   Vercel dalej działa; jeśli poprosi o dostęp, zatwierdź go w GitHub → Settings → Applications → Vercel.
 
+## Pulpit (Dashboard)
+Po zalogowaniu panel otwiera **pulpit**: wartość zamówień w tym miesiącu (i zmiana do poprzedniego), ile zamówień czeka
+na start, ile jest w warsztacie i ile gotowych / w drodze, wykres wartości zamówień z 6 miesięcy (najedź na słupek),
+lista „Needs attention” (wyprzedane produkty, nieopłacone ręczne zamówienia, realizacje z przykładowymi zdjęciami)
+i ostatnie zamówienia. Lista wszystkich zamówień jest w **Orders**.
+
+## Treść strony (Content)
+Panel → **Content**: zmieniasz bez programisty:
+- dane kontaktowe (telefon, WhatsApp, e-mail, adres, godziny, link do Google Maps): nagłówek, stopka, Contact, About, maile,
+- nagłówek strony głównej (słowa w \*gwiazdkach\* dostają ołówkowe podkreślenie) i tekst pod nim,
+- strefy dostawy z cenami dostawy i montażu (strona Delivery i kasa),
+- ceny „from” przy usługach, opłatę za pomiar i czas odpowiedzi na wycenę.
+Zmiany widać na stronie od razu po zapisaniu.
+
 ## Produkty w panelu
 Panel → **Products**:
 - **+ New product**: nazwa, adres strony (tworzy się sam), kategoria, sposób sprzedaży

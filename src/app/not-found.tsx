@@ -1,11 +1,13 @@
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { ButtonLink, Container } from "@/components/ui";
+import { getContact } from "@/lib/content";
 
-export default function NotFound() {
+export default async function NotFound() {
+  const { phone, phoneHref } = await getContact();
   return (
     <>
-    <Header />
+    <Header phone={phone} phoneHref={phoneHref} />
     <main className="flex-1">
     <Container className="py-24 text-center">
       <p className="font-serif text-6xl font-semibold text-brand">404</p>

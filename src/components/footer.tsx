@@ -3,6 +3,7 @@ import { Logo } from "@/components/logo";
 import { Container } from "@/components/ui";
 import { categories } from "@/lib/catalog";
 import { getServices } from "@/lib/services";
+import { getContact } from "@/lib/content";
 import { site } from "@/lib/site";
 
 const columns = [
@@ -31,7 +32,8 @@ const columns = [
   },
 ];
 
-export function Footer() {
+export async function Footer() {
+  const contact = await getContact();
   return (
     <footer className="mt-auto bg-ink text-white/80">
       <Container className="grid gap-10 py-14 md:grid-cols-[1.4fr_repeat(3,1fr)]">
@@ -39,16 +41,16 @@ export function Footer() {
           <Logo variant="dark" width={200} />
           <p className="mt-5 max-w-xs text-sm">{site.description}</p>
           <p className="mt-4 text-sm">
-            {site.address.street}, {site.address.locality}, {site.address.county}
+            {contact.address}
             <br />
-            {site.hours}
+            {contact.hours}
             <br />
-            <a href={site.phoneHref} className="hover:text-white">
-              {site.phone}
+            <a href={contact.phoneHref} className="hover:text-white">
+              {contact.phone}
             </a>
             <br />
-            <a href={`mailto:${site.email}`} className="hover:text-white">
-              {site.email}
+            <a href={`mailto:${contact.email}`} className="hover:text-white">
+              {contact.email}
             </a>
           </p>
         </div>

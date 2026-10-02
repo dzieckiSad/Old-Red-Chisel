@@ -5,14 +5,15 @@ import { SketchIcon } from "@/components/sketch/icons";
 import { Frame, SketchCircle } from "@/components/sketch/ornaments";
 import { Reveal } from "@/components/sketch/reveal";
 import { ButtonLink, CheckList, Container, PageHeader, PhotoPlaceholder, SectionHeading } from "@/components/ui";
-import { type Service, getServices } from "@/lib/services";
+import { getServicesWithPrices } from "@/lib/content";
+import type { Service } from "@/lib/services";
 
 const groupPaths: Record<Service["group"], string> = {
   bespoke: "/bespoke",
   build: "/build-renovate",
 };
 
-export function ServiceIndex({
+export async function ServiceIndex({
   group,
   eyebrow,
   title,
@@ -27,7 +28,7 @@ export function ServiceIndex({
     <>
       <PageHeader eyebrow={eyebrow} title={title} intro={intro} />
       <Container className="grid gap-x-6 gap-y-10 py-14 md:grid-cols-2 lg:grid-cols-3">
-        {getServices(group).map((s, i) => (
+        {(await getServicesWithPrices()).filter((s) => s.group === group).map((s, i) => (
           <Reveal key={s.slug} delay={(i % 3) * 90}>
             <IconCard
               href={`${groupPaths[group]}/${s.slug}`}
@@ -54,7 +55,9 @@ export function ServiceIndex({
   );
 }
 
-export function ServiceDetail({ service }: { service: Service }) {
+export async function ServiceDetail({ service: base }: { service: Service }) {
+  // "from" price as set in the admin panel (Content).
+  const service = (await getServicesWithPrices()).find((s) => s.slug === base.slug) ?? base;
   const parentPath = groupPaths[service.group];
   return (
     <>

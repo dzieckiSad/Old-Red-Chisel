@@ -8,7 +8,6 @@ import { MAX_PHOTOS, MAX_PHOTO_BYTES, type QuoteState, budgets, projectTypes, ti
 import { SketchIcon } from "@/components/sketch/icons";
 import { CornerMarks } from "@/components/sketch/ornaments";
 import { ButtonArrow } from "@/components/ui";
-import { site } from "@/lib/site";
 
 const steps = ["Your project", "Details", "Contact"] as const;
 
@@ -21,9 +20,12 @@ const fieldStep: Record<string, number> = { projectType: 0, description: 1, phot
 export function QuoteForm({
   initialType,
   product,
+  site,
 }: {
   initialType: string;
   product?: { slug: string; name: string };
+  /** Contact details and reply time, from the admin panel's Content settings. */
+  site: { phone: string; phoneHref: string; quoteResponseHours: number };
 }) {
   const [state, formAction, pending] = useActionState<QuoteState, FormData>(submitQuote, { status: "idle" });
   const [step, setStep] = useState(initialType ? 1 : 0);

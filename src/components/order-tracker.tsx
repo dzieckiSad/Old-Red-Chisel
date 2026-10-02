@@ -3,9 +3,10 @@ import { CornerMarks, PencilNote, SketchCircle } from "@/components/sketch/ornam
 import { Reveal } from "@/components/sketch/reveal";
 import type { Order, OrderEvent } from "@/lib/orders";
 import { currentStepIndex, deliveryLabels, formatCents, formatDate, paymentSummary, statusLabels, trackingSteps } from "@/lib/order-status";
-import { site } from "@/lib/site";
+import { getContact } from "@/lib/content";
 
-export function OrderTracker({ order, events }: { order: Order; events: OrderEvent[] }) {
+export async function OrderTracker({ order, events }: { order: Order; events: OrderEvent[] }) {
+  const site = await getContact();
   const steps = trackingSteps(order.deliveryMethod);
   const current = currentStepIndex(order.deliveryMethod, order.status);
   const cancelled = order.status === "cancelled";
@@ -118,7 +119,7 @@ export function OrderTracker({ order, events }: { order: Order; events: OrderEve
           </h2>
           <p className="mt-2 text-graphite">
             {order.deliveryMethod === "collection"
-              ? `Our workshop, ${site.address.locality}. We'll text you when it's ready.`
+              ? `Our workshop, ${site.locality}. We'll text you when it's ready.`
               : [order.address, order.town, order.eircode].filter(Boolean).join(", ")}
           </p>
         </section>

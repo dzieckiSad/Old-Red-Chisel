@@ -6,7 +6,7 @@ import { ButtonLink, Container, PhotoPlaceholder } from "@/components/ui";
 import { ProductPhoto } from "@/components/product-photo";
 import { type Product, currentPrice, isSoldOut, modeLabels, onSale } from "@/lib/catalog";
 import { formatPrice } from "@/lib/format";
-import { site } from "@/lib/site";
+import { getContact, getContent } from "@/lib/content";
 
 export function ProductCard({ product }: { product: Product }) {
   const sale = onSale(product);
@@ -55,14 +55,14 @@ export function ProductCard({ product }: { product: Product }) {
 }
 
 // TODO: replace with real figures once the Google Business Profile is live.
-const trustItems: { icon: IconName; value: string; label: string }[] = [
-  { icon: "plane", value: "Handmade", label: "in our Athlone workshop" },
-  { icon: "team", value: "One team", label: "from survey to fitting" },
-  { icon: "clock", value: `${site.quoteResponseHours}h`, label: "quote response time" },
-  { icon: "shield", value: "Fully insured", label: "public liability cover" },
-];
-
-export function TrustBar() {
+export async function TrustBar() {
+  const { quoteResponseHours } = await getContent();
+  const trustItems: { icon: IconName; value: string; label: string }[] = [
+    { icon: "plane", value: "Handmade", label: "in our Athlone workshop" },
+    { icon: "team", value: "One team", label: "from survey to fitting" },
+    { icon: "clock", value: `${quoteResponseHours}h`, label: "quote response time" },
+    { icon: "shield", value: "Fully insured", label: "public liability cover" },
+  ];
   return (
     <div className="border-y border-line bg-white">
       <Container className="grid grid-cols-2 gap-6 py-8 md:grid-cols-4">
@@ -80,7 +80,7 @@ export function TrustBar() {
   );
 }
 
-export const processSteps: { icon: IconName; title: string; text: string }[] = [
+const processSteps = (surveyFee: number): { icon: IconName; title: string; text: string }[] => [
   {
     icon: "camera",
     title: "Tell us what you need",
@@ -94,7 +94,7 @@ export const processSteps: { icon: IconName; title: string; text: string }[] = [
   {
     icon: "tape",
     title: "Survey & design",
-    text: `We measure on site and draw up the design. The €${site.surveyFee} survey fee comes off your order.`,
+    text: `We measure on site and draw up the design. The €${surveyFee} survey fee comes off your order.`,
   },
   {
     icon: "chisel",
@@ -108,14 +108,15 @@ export const processSteps: { icon: IconName; title: string; text: string }[] = [
   },
 ];
 
-export function ProcessSteps() {
+export async function ProcessSteps() {
+  const { surveyFee } = await getContent();
   return (
     <ol className="relative grid gap-8 md:grid-cols-5 md:gap-5">
       {/* pencil guide line joining the steps */}
       <svg aria-hidden className="absolute top-7 left-[10%] hidden h-3 w-[80%] md:block" viewBox="0 0 800 12" preserveAspectRatio="none">
         <path d="M0 6C120 3 260 9 400 6s280-3 400 0" fill="none" stroke="var(--color-line)" strokeWidth="2" strokeDasharray="6 8" filter="url(#sketch-line)" />
       </svg>
-      {processSteps.map((step, i) => (
+      {processSteps(surveyFee).map((step, i) => (
         <Reveal as="li" key={step.title} delay={i * 90} className="relative flex gap-4 md:block">
           <div className="relative z-10 grid h-16 w-16 shrink-0 place-items-center border border-line bg-cream">
             <SketchIcon name={step.icon} size={40} />
@@ -133,13 +134,15 @@ export function ProcessSteps() {
   );
 }
 
-export function CtaBand({
+export async function CtaBand({
   title = "Have a project in mind?",
-  text = "Send us a photo and a few measurements. You'll get a price range within 48 hours, with no obligation.",
+  text,
 }: {
   title?: string;
   text?: string;
 }) {
+  const [{ whatsappHref }, { quoteResponseHours }] = await Promise.all([getContact(), getContent()]);
+  text ??= `Send us a photo and a few measurements. You'll get a price range within ${quoteResponseHours} hours, with no obligation.`;
   return (
     <section className="relative overflow-hidden bg-brand text-white">
       <SketchIcon
@@ -157,7 +160,7 @@ export function CtaBand({
           <ButtonLink href="/quote" variant="light" arrow>
             Get a free quote
           </ButtonLink>
-          <a href={site.whatsappHref} className="btn btn--dark">
+          <a href={whatsappHref} className="btn btn--dark">
             <SketchIcon name="chat" size={22} className="[--sketch-accent:white] [--sketch-ink:white]" />
             WhatsApp a photo
           </a>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { CheckoutForm } from "@/components/checkout-form";
 import { Container, PageHeader } from "@/components/ui";
+import { getContact, getDeliveryZones } from "@/lib/content";
 import { paymentMode } from "@/lib/payments";
 
 export const metadata: Metadata = { title: "Checkout", robots: { index: false } };
@@ -13,6 +14,7 @@ const errors: Record<string, string> = {
 export default async function CheckoutPage({ searchParams }: PageProps<"/checkout">) {
   const { error } = await searchParams;
   const mode = paymentMode();
+  const [contact, deliveryZones] = await Promise.all([getContact(), getDeliveryZones()]);
   return (
     <>
       <PageHeader eyebrow="Checkout" title="Delivery & payment" />
@@ -21,6 +23,8 @@ export default async function CheckoutPage({ searchParams }: PageProps<"/checkou
           mode={mode}
           publishableKey={process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? ""}
           initialError={typeof error === "string" ? errors[error] : undefined}
+          deliveryZones={deliveryZones}
+          site={{ phone: contact.phone, phoneHref: contact.phoneHref, locality: contact.locality }}
         />
       </Container>
     </>

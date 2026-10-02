@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+/* Brand colours come from the logo (assets/brand/README.md). */
+@theme {
+  --color-brand: #b33938;
+  --color-brand-dark: #8f2b2a;
+  --color-graphite: #4e4e4e;
+  --color-ink: #24201d;
+  --color-cream: #f7f3ee;
+  --color-sand: #ece4d9;
+  --color-oak: #a8754a;
+  --color-line: #ddd3c6;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-fraunces), ui-serif, Georgia, serif;
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-ink);
+}
+
+/* Stand-in for photos until real project and product images are added. */
+.wood-placeholder {
+  background-color: #b98a5e;
+  background-image:
+    repeating-linear-gradient(
+      100deg,
+      rgb(255 255 255 / 0.06) 0 2px,
+      transparent 2px 14px
+    ),
+    repeating-linear-gradient(
+      96deg,
+      rgb(60 30 10 / 0.08) 0 1px,
+      transparent 1px 23px
+    ),
+    linear-gradient(135deg, #c99a6b, #9c6c43);
+}

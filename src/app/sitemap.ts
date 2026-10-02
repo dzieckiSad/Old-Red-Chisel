@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getProducts } from "@/lib/products";
+import { getProjects } from "@/lib/projects";
 import { services } from "@/lib/services";
 import { site } from "@/lib/site";
 
@@ -11,6 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...staticPaths.map((p) => ({ url: `${site.url}${p}` })),
     ...(await getProducts()).map((p) => ({ url: `${site.url}/shop/${p.slug}` })),
+    ...(await getProjects()).map((p) => ({ url: `${site.url}/projects/${p.slug}` })),
     ...services.map((s) => ({ url: `${site.url}/${s.group === "bespoke" ? "bespoke" : "build-renovate"}/${s.slug}` })),
   ];
 }

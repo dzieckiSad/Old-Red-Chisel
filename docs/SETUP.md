@@ -97,6 +97,15 @@ Panel → **Products**:
 Przykładowe produkty zostały wczytane jako widoczne. Zmień je albo ukryj.
 Opcje z dopłatami (drewno, wykończenie) są na razie ustawione w kodzie.
 
+## Realizacje (Projects)
+Panel → **Projects**: prace pokazywane na stronie **Projects** z suwakiem przed/po.
+- **+ New project**: tytuł, miejscowość, rodzaj pracy, krótki opis, historia, materiały, czas realizacji,
+- **Before & after**: zdjęcie przed i po. Róbcie oba z tego samego miejsca, żeby suwak się pokrywał,
+- **More photos**: dodatkowe zdjęcia pod opisem,
+- **★** pokazuje realizację na stronie głównej w „See the difference”, **↑ ↓** kolejność, **Hide / Show** ukrycie.
+Na start są 4 przykładowe realizacje z rysowanymi zdjęciami (oznaczone „Example” w panelu i „Example image”
+na stronie). Przed startem sklepu podmień zdjęcia na prawdziwe albo usuń te realizacje.
+
 ## Ręczne zamówienia (klient nie płaci przez stronę)
 Panel → **Orders → + New order**: dla zamówień przez telefon albo na miejscu.
 - dane klienta, dostawa lub odbiór, pozycje: produkt ze sklepu albo dowolna pozycja

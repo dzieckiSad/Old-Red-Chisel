@@ -6,12 +6,13 @@ import {
   ProductCard,
   TrustBar,
 } from "@/components/sections";
-import { BeforeAfter } from "@/components/sketch/before-after";
+import { ProjectVisual } from "@/components/project-visual";
 import type { IconName } from "@/components/sketch/icons";
 import { Frame, PencilNote, RulerDivider, SketchUnderline } from "@/components/sketch/ornaments";
 import { Reveal } from "@/components/sketch/reveal";
 import { ButtonLink, Container, PhotoPlaceholder, SectionHeading } from "@/components/ui";
 import { getFeaturedProducts } from "@/lib/products";
+import { getFeaturedProject } from "@/lib/projects";
 import { site } from "@/lib/site";
 
 // Product data can change from the admin panel; saves also refresh pages immediately.
@@ -65,7 +66,7 @@ const faqs = [
 ];
 
 export default async function HomePage() {
-  const featured = await getFeaturedProducts();
+  const [featured, project] = await Promise.all([getFeaturedProducts(), getFeaturedProject()]);
 
   return (
     <>
@@ -155,14 +156,15 @@ export default async function HomePage() {
             </div>
           </Reveal>
           <Reveal delay={120}>
-            <Frame caption="alcove units, Athlone">
-              <BeforeAfter
-                className="aspect-[4/3]"
-                label="Alcove units: before and after"
-                before={<div className="plaster-placeholder h-full w-full" />}
-                after={<PhotoPlaceholder className="h-full w-full" />}
-              />
-            </Frame>
+            {project ? (
+              <Frame caption={[project.title.toLowerCase(), project.place].filter(Boolean).join(", ")}>
+                <ProjectVisual project={project} sizes="(min-width: 768px) 55vw, 100vw" />
+              </Frame>
+            ) : (
+              <Frame>
+                <PhotoPlaceholder className="aspect-[4/3]" />
+              </Frame>
+            )}
           </Reveal>
         </Container>
       </section>

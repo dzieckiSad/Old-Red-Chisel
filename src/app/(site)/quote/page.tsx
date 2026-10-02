@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { QuoteForm } from "@/components/quote-form";
 import { CheckList, Container, PageHeader } from "@/components/ui";
-import { getProduct } from "@/lib/catalog";
+import { getProduct } from "@/lib/products";
 import { initialProjectType } from "@/lib/quote";
 import { site } from "@/lib/site";
 
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default async function QuotePage({ searchParams }: PageProps<"/quote">) {
   const params = await searchParams;
   const first = (v: string | string[] | undefined) => (typeof v === "string" ? v : undefined);
-  const product = getProduct(first(params.product) ?? "");
+  const product = await getProduct(first(params.product) ?? "");
   const initialType = product ? "custom-product" : initialProjectType({ type: first(params.type), service: first(params.service) });
 
   return (

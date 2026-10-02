@@ -14,6 +14,11 @@ Dopóki czegoś brakuje, strona działa bezpiecznie:
 2. Połącz z projektem `oldredchisel` (wszystkie środowiska). Vercel sam doda `DATABASE_URL`.
 3. Tabele tworzą się same przy pierwszym uruchomieniu.
 
+## 1b. Zdjęcia produktów (Vercel Blob, darmowy limit na start)
+1. Vercel → projekt → **Storage → Create Database → Blob** → nazwa np. `product-photos`.
+2. Połącz z projektem `oldredchisel`. Vercel sam doda `BLOB_READ_WRITE_TOKEN`.
+3. Od teraz zdjęcia dodane w panelu (Products → produkt → Add photos) trafiają do Blob.
+
 ## 2. Sekret sesji
 Dodaj `SESSION_SECRET`: losowy ciąg 40+ znaków (np. z generatora haseł). Nigdy go nie udostępniaj.
 Jego zmiana wyloguje wszystkich i unieważni niewysłane hasła zamówień, więc ustaw raz.
@@ -84,6 +89,17 @@ Potem za każdym razem: `npm run admin`. Plik `.env.admin` nie trafia do repozyt
 - po 5 błędnych logowaniach na e-mail (10 na adres IP) blokada na 15 minut,
 - sesja wygasa po 8 godzinach, ciasteczka działają tylko pod adresem panelu,
 - **repozytorium ustaw jako prywatne** (GitHub → Settings → Danger Zone → Change visibility).
+
+## Produkty w panelu
+Panel → **Products**:
+- **+ New product**: nazwa, adres strony (tworzy się sam), kategoria, sposób sprzedaży
+  (na stanie / na zamówienie / tylko wycena), opis, wymiary, materiał, czas realizacji, zdjęcia,
+- **cena i stan magazynu**: stan zmniejsza się sam po każdym opłaconym zamówieniu; przy 0 produkt pokazuje „Sold out”,
+- **promocja**: cena promocyjna i (opcjonalnie) ostatni dzień oferty; sklep pokazuje przekreśloną starą cenę,
+- **☆ / ★** wyróżnienie na stronie głównej, **↑ ↓** kolejność w sklepie, **Hide / Show** ukrycie bez kasowania,
+- usuwanie na dole strony produktu (kasuje też zdjęcia).
+Przykładowe produkty zostały wczytane jako widoczne. Zmień je albo ukryj.
+Opcje z dopłatami (drewno, wykończenie) są na razie ustawione w kodzie.
 
 ## Jak działa zamówienie (dla klienta)
 1. Koszyk → **Checkout**: dane, dostawa/montaż/odbiór, płatność kartą na naszej stronie.

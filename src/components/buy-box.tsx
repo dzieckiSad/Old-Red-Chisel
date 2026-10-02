@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { type Product, modeLabels } from "@/lib/catalog";
+import { type Product, currentPrice, isSoldOut, modeLabels, onSale } from "@/lib/catalog";
 import { addToCart } from "@/lib/cart";
 import { formatPrice } from "@/lib/format";
 import { SketchIcon } from "@/components/sketch/icons";
@@ -16,15 +16,17 @@ export function BuyBox({ product }: { product: Product }) {
   );
   const [added, setAdded] = useState(false);
 
+  const sale = onSale(product);
   const price =
-    product.price +
+    currentPrice(product) +
     options.reduce((sum, o) => {
       const choice = o.choices.find((c) => c.label === selected[o.name]);
       return sum + (choice?.priceDelta ?? 0);
     }, 0);
 
   const quoteHref = `/quote?type=custom-product&product=${product.slug}`;
-  const soldOut = product.mode === "in_stock" && (product.stock ?? 0) <= 0;
+  const soldOut = isSoldOut(product);
+  const regularPrice = price - currentPrice(product) + product.price;
 
   if (product.mode === "quote_only") {
     return (
@@ -49,7 +51,10 @@ export function BuyBox({ product }: { product: Product }) {
     <div className="relative border border-line bg-white p-5">
       <CornerMarks />
       <div className="flex items-baseline justify-between">
-        <p className="font-serif text-3xl font-semibold text-ink">{formatPrice(price)}</p>
+        <p className="font-serif text-3xl font-semibold text-ink">
+          <span className={sale ? "text-brand" : ""}>{formatPrice(price)}</span>
+          {sale && <s className="ml-3 align-middle font-sans text-base font-normal text-graphite">{formatPrice(regularPrice)}</s>}
+        </p>
         <span
           className={`px-2.5 py-1 text-[11px] font-semibold tracking-wide uppercase ${
             soldOut ? "bg-ink/10 text-graphite" : product.mode === "in_stock" ? "bg-ink text-white" : "bg-sand text-ink"
@@ -58,7 +63,17 @@ export function BuyBox({ product }: { product: Product }) {
           {soldOut ? "Sold out" : modeLabels[product.mode]}
         </span>
       </div>
-      <p className="mt-1 text-sm text-graphite">{product.leadTime} · incl. VAT</p>
+      {sale && (
+        <PencilNote className="mt-1 block text-xl text-brand">
+          on offer{product.saleEndsAt ? ` until ${new Date(`${product.saleEndsAt}T12:00:00`).toLocaleDateString("en-IE", { day: "numeric", month: "long" })}` : ""}
+        </PencilNote>
+      )}
+      <p className="mt-1 text-sm text-graphite">
+        {product.leadTime} · incl. VAT
+        {product.mode === "in_stock" && !soldOut && product.stock != null && product.stock <= 3 && (
+          <span className="ml-1 font-medium text-brand">· only {product.stock} left</span>
+        )}
+      </p>
 
       {options.map((option) => (
         <fieldset key={option.name} className="mt-5">

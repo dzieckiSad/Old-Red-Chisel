@@ -61,7 +61,7 @@ export async function startCheckout(input: CheckoutInput): Promise<CheckoutResul
     if (!(await allowAttempt(`checkout:${await clientIp()}`, 15, 60 * 60))) {
       return { ok: false, message: `Too many checkout attempts. Please try again later or call us on ${site.phone}.` };
     }
-    const items = priceCart(Array.isArray(input.cart) ? input.cart : []);
+    const items = await priceCart(Array.isArray(input.cart) ? input.cart : []);
     const order = await createPendingOrder({
       customerName: v.name,
       email: v.email,

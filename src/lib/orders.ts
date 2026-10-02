@@ -1,6 +1,8 @@
 import "server-only";
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
-import { getProduct } from "@/lib/catalog";
+import { revalidatePath } from "next/cache";
+import { currentPrice } from "@/lib/catalog";
+import { getProduct, takeFromStock } from "@/lib/products";
 import { getDb } from "@/lib/db";
 import { type DeliveryMethod, type OrderItem, type OrderStatus, orderEvents, orders } from "@/lib/db/schema";
 import { deliveryZones } from "@/lib/delivery";
@@ -15,10 +17,10 @@ export class CheckoutError extends Error {}
 const cents = (eur: number) => Math.round(eur * 100);
 
 /** Re-prices the cart from the catalogue. Prices sent by the browser are never trusted. */
-export function priceCart(lines: { slug: string; options: Record<string, string>; quantity: number }[]): OrderItem[] {
+export async function priceCart(lines: { slug: string; options: Record<string, string>; quantity: number }[]): Promise<OrderItem[]> {
   if (lines.length === 0) throw new CheckoutError("Your cart is empty.");
-  return lines.map((line) => {
-    const product = getProduct(line.slug);
+  return Promise.all(lines.map(async (line) => {
+    const product = await getProduct(String(line.slug));
     if (!product || product.mode === "quote_only") throw new CheckoutError("An item in your cart is no longer available.");
     const quantity = Math.floor(line.quantity);
     if (!(quantity >= 1 && quantity <= 20)) throw new CheckoutError("Please check the quantities in your cart.");
@@ -26,14 +28,14 @@ export function priceCart(lines: { slug: string; options: Record<string, string>
       throw new CheckoutError(`Only ${product.stock ?? 0} of ${product.name} left in stock.`);
     }
     const options: Record<string, string> = {};
-    let price = product.price;
+    let price = currentPrice(product);
     for (const option of product.options ?? []) {
       const choice = option.choices.find((c) => c.label === line.options?.[option.name]) ?? option.choices[0];
       options[option.name] = choice.label;
       price += choice.priceDelta;
     }
     return { slug: product.slug, name: product.name, options, unitPrice: cents(price), quantity };
-  });
+  }));
 }
 
 export function deliveryFee(method: DeliveryMethod, zoneName: string | null) {
@@ -104,6 +106,8 @@ export async function markPaid(orderId: string, paymentRef: string) {
     .returning();
   if (updated) {
     await db.insert(orderEvents).values({ orderId, status: "paid", note: "Payment received" });
+    await takeFromStock(updated.items);
+    revalidatePath("/", "layout"); // stock levels on shop pages
   }
   const order = updated ?? (await getOrder(orderId));
   if (order) await emailCredentialsOnce(order);

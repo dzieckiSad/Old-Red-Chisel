@@ -3,24 +3,25 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BuyBox } from "@/components/buy-box";
 import { ProductCard } from "@/components/sections";
-import { Container, PhotoPlaceholder, SectionHeading } from "@/components/ui";
-import { getCategory, getProduct, getProducts } from "@/lib/catalog";
+import { ProductGallery } from "@/components/product-gallery";
+import { Container, SectionHeading } from "@/components/ui";
+import { getCategory } from "@/lib/catalog";
+import { getProduct, getProducts } from "@/lib/products";
 
-export function generateStaticParams() {
-  return getProducts().map((p) => ({ slug: p.slug }));
-}
+// Product data can change from the admin panel; saves also refresh pages immediately.
+export const revalidate = 60;
 
 export async function generateMetadata({ params }: PageProps<"/shop/[slug]">): Promise<Metadata> {
-  const product = getProduct((await params).slug);
+  const product = await getProduct((await params).slug);
   if (!product) return {};
   return { title: product.name, description: product.summary };
 }
 
 export default async function ProductPage({ params }: PageProps<"/shop/[slug]">) {
-  const product = getProduct((await params).slug);
+  const product = await getProduct((await params).slug);
   if (!product) notFound();
   const category = getCategory(product.category);
-  const related = getProducts({ category: product.category })
+  const related = (await getProducts({ category: product.category }))
     .filter((p) => p.slug !== product.slug)
     .slice(0, 4);
 
@@ -42,13 +43,8 @@ export default async function ProductPage({ params }: PageProps<"/shop/[slug]">)
         </nav>
 
         <div className="mt-6 grid items-start gap-10 md:grid-cols-2">
-          <div className="grid gap-3 md:sticky md:top-32">
-            <PhotoPlaceholder label="Product photo" className="aspect-square" />
-            <div className="grid grid-cols-3 gap-3">
-              <PhotoPlaceholder className="aspect-square" />
-              <PhotoPlaceholder className="aspect-square" />
-              <PhotoPlaceholder className="aspect-square" />
-            </div>
+          <div className="md:sticky md:top-32">
+            <ProductGallery images={product.images ?? []} name={product.name} />
           </div>
 
           <div>

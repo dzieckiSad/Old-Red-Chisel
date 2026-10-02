@@ -1,6 +1,6 @@
-// Shop catalogue. This is sample data so the site can be built and reviewed;
-// it will be replaced by products managed in the CMS. Keep the function
-// signatures stable so pages don't need to change when the data source does.
+// Shop catalogue types and the sample products. Products are managed in the admin panel and
+// stored in the database (src/lib/products.ts); the samples below seed an empty database and
+// are shown as-is when no database is connected. Safe to import from client components.
 
 /**
  * How a product is bought:
@@ -13,20 +13,29 @@ export type ProductMode = "in_stock" | "made_to_order" | "quote_only";
 export type OptionChoice = { label: string; priceDelta: number };
 export type ProductOption = { name: string; choices: OptionChoice[] };
 
+export type ProductImage = { url: string; alt?: string };
+
 export type Product = {
+  id?: string;
   slug: string;
   name: string;
   category: CategorySlug;
   mode: ProductMode;
   price: number; // base price in EUR incl. VAT; "from" price for quote_only
+  /** Promotion: reduced base price, optionally until saleEndsAt (YYYY-MM-DD, inclusive). */
+  salePrice?: number | null;
+  saleEndsAt?: string | null;
   summary: string;
   description: string;
   dimensions: string;
   material: string;
   leadTime: string;
-  stock?: number;
+  stock?: number | null;
   options?: ProductOption[];
+  images?: ProductImage[];
   featured?: boolean;
+  hidden?: boolean;
+  sortOrder?: number;
 };
 
 export const categories = [
@@ -58,7 +67,7 @@ const finishOptions: ProductOption = {
   ],
 };
 
-const products: Product[] = [
+export const sampleProducts: Product[] = [
   {
     slug: "shannon-bedside-locker",
     name: "Shannon Bedside Locker",
@@ -199,17 +208,27 @@ const products: Product[] = [
   },
 ];
 
-export function getProducts(filter?: { category?: string }) {
-  if (!filter?.category) return products;
-  return products.filter((p) => p.category === filter.category);
+function todayInIreland() {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Dublin" }).format(new Date());
 }
 
-export function getFeaturedProducts() {
-  return products.filter((p) => p.featured);
+/** True while the product's promotion applies. */
+export function onSale(product: Pick<Product, "price" | "salePrice" | "saleEndsAt">) {
+  return (
+    product.salePrice != null &&
+    product.salePrice > 0 &&
+    product.salePrice < product.price &&
+    (!product.saleEndsAt || product.saleEndsAt >= todayInIreland())
+  );
 }
 
-export function getProduct(slug: string) {
-  return products.find((p) => p.slug === slug);
+/** Base price the customer pays now (before option surcharges). */
+export function currentPrice(product: Pick<Product, "price" | "salePrice" | "saleEndsAt">) {
+  return onSale(product) ? product.salePrice! : product.price;
+}
+
+export function isSoldOut(product: Pick<Product, "mode" | "stock">) {
+  return product.mode === "in_stock" && (product.stock ?? 0) <= 0;
 }
 
 export function getCategory(slug: string) {

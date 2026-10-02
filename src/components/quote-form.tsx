@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { type ChangeEvent, type FormEvent, useActionState, useRef, useState, startTransition } from "react";
+import { shrinkImage } from "@/lib/shrink-image";
 import { submitQuote } from "@/app/(site)/quote/actions";
 import { MAX_PHOTOS, MAX_PHOTO_BYTES, type QuoteState, budgets, projectTypes, timings } from "@/lib/quote";
 import { SketchIcon } from "@/components/sketch/icons";
@@ -13,24 +14,6 @@ const steps = ["Your project", "Details", "Contact"] as const;
 
 const inputClass =
   "mt-1.5 block w-full border border-line border-b-2 border-b-ink/25 bg-cream/50 px-3 py-2.5 text-ink transition-colors placeholder:text-graphite/50 focus:border-b-brand focus:bg-white focus:outline-none";
-
-// Phone photos are often 3–8 MB; shrink them in the browser so several fit in one request.
-async function shrinkImage(file: File, maxSide = 1600): Promise<File> {
-  if (!file.type.startsWith("image/") || file.type === "image/gif") return file;
-  try {
-    const bitmap = await createImageBitmap(file);
-    const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.round(bitmap.width * scale);
-    canvas.height = Math.round(bitmap.height * scale);
-    canvas.getContext("2d")?.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-    const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, "image/jpeg", 0.82));
-    if (!blob || blob.size >= file.size) return file;
-    return new File([blob], file.name.replace(/\.\w+$/, "") + ".jpg", { type: "image/jpeg" });
-  } catch {
-    return file; // e.g. HEIC the browser can't decode: send as-is
-  }
-}
 
 // Which step each field lives on, so server-side errors can send the visitor back to it.
 const fieldStep: Record<string, number> = { projectType: 0, description: 1, photos: 1, budget: 1, timing: 1 };

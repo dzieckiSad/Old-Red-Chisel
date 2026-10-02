@@ -7,6 +7,16 @@ import stairsAfter from "@/assets/projects/stairs-after.jpg";
 import stairsBefore from "@/assets/projects/stairs-before.jpg";
 import wardrobeAfter from "@/assets/projects/wardrobe-after.jpg";
 import wardrobeBefore from "@/assets/projects/wardrobe-before.jpg";
+import officeAfter from "@/assets/projects/office-after.jpg";
+import officeBefore from "@/assets/projects/office-before.jpg";
+import renovationAfter from "@/assets/projects/renovation-after.jpg";
+import renovationBefore from "@/assets/projects/renovation-before.jpg";
+import deckAfter from "@/assets/projects/deck-after.jpg";
+import deckBefore from "@/assets/projects/deck-before.jpg";
+import atticAfter from "@/assets/projects/attic-after.jpg";
+import atticBefore from "@/assets/projects/attic-before.jpg";
+import doorAfter from "@/assets/projects/door-after.jpg";
+import doorBefore from "@/assets/projects/door-before.jpg";
 import { PhotoPlaceholder } from "@/components/ui";
 import type { ProjectImage, SampleImageName } from "@/lib/project-types";
 
@@ -19,6 +29,16 @@ const samples: Record<SampleImageName, StaticImageData> = {
   "stairs-after": stairsAfter,
   "kitchen-before": kitchenBefore,
   "kitchen-after": kitchenAfter,
+  "office-before": officeBefore,
+  "office-after": officeAfter,
+  "renovation-before": renovationBefore,
+  "renovation-after": renovationAfter,
+  "deck-before": deckBefore,
+  "deck-after": deckAfter,
+  "attic-before": atticBefore,
+  "attic-after": atticAfter,
+  "door-before": doorBefore,
+  "door-after": doorAfter,
 };
 
 /**

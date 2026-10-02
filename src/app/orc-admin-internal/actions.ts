@@ -36,7 +36,7 @@ export async function loginAdmin(_prev: FormState, f: FormData): Promise<FormSta
 
   const wrong = TEMP_ADMIN_2FA_OFF ? "That password is wrong." : "Password or code is wrong.";
   const password = adminPassword();
-  if (password.length < 12 || !safeEqual(String(f.get("password") ?? ""), password)) return { error: wrong };
+  if (password.length < 8 || !safeEqual(String(f.get("password") ?? ""), password)) return { error: wrong };
 
   if (!TEMP_ADMIN_2FA_OFF) {
     const stored = await storedTotpSecret();

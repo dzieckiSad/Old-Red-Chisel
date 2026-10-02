@@ -59,9 +59,13 @@ Nie ma kont: jest **jeden panel i jedno stałe hasło**, to samo dla Ciebie i sz
 | Nazwa | Wartość |
 |---|---|
 | `SESSION_SECRET` | losowe 40+ znaków (punkt 2) |
-| `ADMIN_PASSWORD` | hasło do panelu, 12+ znaków |
+| `ADMIN_PASSWORD` | hasło do panelu, 8+ znaków (na czas budowy niepotrzebne, patrz niżej) |
 
-Oraz **baza danych** (punkt 1). Potem Redeploy i otwórz `/admin`. Jeśli czegoś brakuje, panel pokaże listę
+Oraz **baza danych** (punkt 1).
+
+**Na czas budowy strony** hasło do panelu to **`admin123`**, jeśli `ADMIN_PASSWORD` nie jest ustawione w Vercelu.
+Jest zapisane w kodzie (`src/lib/admin-config.ts`), więc każdy, kto widzi repozytorium, je zna: przed startem
+usuwamy je i ustawiamy mocne `ADMIN_PASSWORD`. Potem Redeploy i otwórz `/admin`. Jeśli czegoś brakuje, panel pokaże listę
 „Almost there” z tym, co dodać.
 
 **Zmiana hasła:** zmień `ADMIN_PASSWORD` w Vercelu i zrób Redeploy. Wszyscy zalogowani zostaną wylogowani.

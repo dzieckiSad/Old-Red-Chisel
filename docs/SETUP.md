@@ -9,6 +9,12 @@ Dopóki czegoś brakuje, strona działa bezpiecznie:
 - bez kluczy Stripe przycisk testowej płatności działa tylko lokalnie, nigdy w Vercelu,
 - bez bazy danych `/admin` pokazuje listę brakujących ustawień (punkt 5).
 
+## 0. Prywatny podgląd (hasło na całą stronę)
+Na czas budowy strona może być zamknięta hasłem, żeby widzieli ją tylko Ty i szef.
+Vercel → **Settings → Environment Variables** → `SITE_PASSWORD` = hasło do podglądu (6+ znaków) → Redeploy.
+Każdy, kto wejdzie na stronę, najpierw zobaczy ekran z hasłem; po wpisaniu przeglądarka pamięta je 30 dni.
+Zmiana hasła wylogowuje wszystkich. Przy starcie sklepu usuń `SITE_PASSWORD` i zrób Redeploy.
+
 ## 1. Baza danych (Neon, darmowa)
 1. Vercel → projekt → **Storage → Create Database → Neon (Serverless Postgres)** → plan Free → region **Europe (Frankfurt lub London)**.
 2. Połącz z projektem `oldredchisel` (wszystkie środowiska). Vercel sam doda `DATABASE_URL`.

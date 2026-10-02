@@ -80,3 +80,7 @@ export function setQuantity(key: string, quantity: number) {
 export function cartTotal(cart: CartItem[]) {
   return cart.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0);
 }
+
+export function clearCart() {
+  write([]);
+}

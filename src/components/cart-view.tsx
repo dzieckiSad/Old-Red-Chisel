@@ -85,19 +85,16 @@ export function CartView() {
           <span>{formatPrice(cartTotal(cart))}</span>
         </div>
         <p className="mt-2 text-sm text-graphite">
-          Incl. VAT. Delivery, assembly or free workshop collection is chosen at checkout.{" "}
+          Incl. VAT. Choose delivery, assembly or free workshop collection at checkout.{" "}
           <Link href="/delivery" className="underline">
             Delivery prices
           </Link>
         </p>
-        {/* TODO: connect to Stripe Checkout */}
-        <button
-          type="button"
-          disabled
-          className="btn btn--primary mt-5 w-full cursor-not-allowed opacity-50"
-        >
-          Checkout (coming soon)
-        </button>
+        <Link href="/checkout" className="btn btn--primary mt-5 w-full !py-4 !text-base">
+          Checkout
+          <SketchIcon name="arrow" size={22} className="[--sketch-accent:white]" />
+        </Link>
+        <p className="mt-3 text-center text-xs text-graphite">No account needed. Pay by card, Apple Pay or Google Pay.</p>
       </aside>
     </div>
   );

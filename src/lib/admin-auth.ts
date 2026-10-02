@@ -30,11 +30,7 @@ export async function adminBase() {
 export function adminConfigIssues() {
   const issues: { name: string; how: string }[] = [];
   if (!isDatabaseConfigured()) {
-    issues.push({ name: "Database", how: "Vercel → Storage → Create Database → Neon → connect it to this project." });
-  }
-  const secret = process.env.SESSION_SECRET ?? "";
-  if (secret && secret.length < 32) {
-    issues.push({ name: "SESSION_SECRET", how: "Settings → Environment Variables: make it 40+ random characters, or delete it." });
+    issues.push({ name: "Database", how: "Set DATABASE_URL to a PostgreSQL database (e.g. Neon), then restart or redeploy." });
   }
   if (adminPassword().length < 8) {
     issues.push({ name: "ADMIN_PASSWORD", how: "Settings → Environment Variables: the panel password, 8+ characters." });

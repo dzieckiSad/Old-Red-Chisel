@@ -1,13 +1,22 @@
 # Uruchomienie zamówień, płatności i panelu admina
 
-Kod jest gotowy. Żeby działał na prawdziwej stronie, w Vercelu trzeba podłączyć kilka usług
-i wpisać ich klucze. Wszystko ustawiasz w: **Vercel → projekt `orc` → Settings → Environment Variables**.
-Po każdej zmianie zmiennych: **Deployments → ⋯ → Redeploy**.
+Strona działa na **każdym hostingu z Node.js** (Vercel, własny serwer VPS, inny hosting). Vercel to tylko
+tymczasowy podgląd. Ustawienia to zwykłe zmienne środowiskowe (lista: `.env.example`): na Vercelu w
+**Settings → Environment Variables** (po zmianie: **Deployments → ⋯ → Redeploy**), na serwerze w pliku `.env.local`.
 
 Dopóki czegoś brakuje, strona działa bezpiecznie:
-- bez bazy danych i Stripe sklep pokazuje „Online payment opens soon” i numer telefonu,
-- bez kluczy Stripe przycisk testowej płatności działa tylko lokalnie, nigdy w Vercelu,
-- bez bazy danych `/admin` pokazuje listę brakujących ustawień (punkt 5).
+- bez kluczy Stripe sklep pokazuje „Online payment opens soon” i numer telefonu (testowa płatność tylko przy `npm run dev`),
+- bez bazy danych `/admin` pokazuje listę brakujących ustawień.
+
+## Hosting docelowy (dowolny serwer)
+Na zwykłym serwerze (np. VPS) strona nie potrzebuje żadnych zewnętrznych usług poza Stripe i Resend:
+- **baza**: wbudowana, w folderze `DATA_DIR` (domyślnie `.data`); albo dowolny PostgreSQL przez `DATABASE_URL`,
+- **zdjęcia z panelu**: w `DATA_DIR/uploads`,
+- **klucz podpisu sesji**: tworzy się sam w `DATA_DIR/secret.key`.
+Uruchomienie: `npm ci && npm run build && npm start` (port 3000, przed nim serwer www z HTTPS, np. Caddy lub nginx).
+**Folder `DATA_DIR` trzeba kopiować (backup)**, bo są w nim zamówienia i zdjęcia.
+
+Przenosiny z Vercela: wystarczy skopiować `DATABASE_URL` (Neon działa z każdym hostingiem) i zdjęcia z Blob.
 
 ## 0. Prywatny podgląd (hasło na całą stronę)
 Na czas budowy strona może być zamknięta hasłem, żeby widzieli ją tylko Ty i szef.
@@ -15,21 +24,17 @@ Vercel → **Settings → Environment Variables** → `SITE_PASSWORD` = hasło d
 Każdy, kto wejdzie na stronę, najpierw zobaczy ekran z hasłem; po wpisaniu przeglądarka pamięta je 30 dni.
 Zmiana hasła wylogowuje wszystkich. Przy starcie sklepu usuń `SITE_PASSWORD` i zrób Redeploy.
 
-## 1. Baza danych (Neon, darmowa)
+## 1. Baza danych na Vercelu (Neon, darmowa)
 1. Vercel → projekt → **Storage → Create Database → Neon (Serverless Postgres)** → plan Free → region **Europe (Frankfurt lub London)**.
 2. Połącz z projektem `orc` (wszystkie środowiska). Vercel sam doda `DATABASE_URL`
    (jeśli w polu **Custom Prefix** wpiszesz własną nazwę, np. `ORCstorage`, strona i tak znajdzie bazę).
 3. Tabele tworzą się same przy pierwszym uruchomieniu.
 
-## 1b. Zdjęcia produktów (Vercel Blob, darmowy limit na start)
+## 1b. Zdjęcia produktów na Vercelu (Vercel Blob, darmowy limit na start)
+Vercel nie zapisuje plików na dysku, dlatego tam zdjęcia idą do Blob. Na zwykłym serwerze ten punkt pomijasz.
 1. Vercel → projekt → **Storage → Create Database → Blob** → nazwa np. `product-photos`.
 2. Połącz z projektem `orc`. Vercel sam doda `BLOB_READ_WRITE_TOKEN`.
 3. Od teraz zdjęcia dodane w panelu (Products → produkt → Add photos) trafiają do Blob.
-
-## 2. Sekret sesji
-**Opcjonalnie.** Bez niego strona sama tworzy sekret z tajnego adresu bazy danych.
-Jeśli chcesz osobny: dodaj `SESSION_SECRET`, losowy ciąg 40+ znaków (np. z generatora haseł). Nigdy go nie udostępniaj.
-Jego zmiana wyloguje wszystkich i unieważni niewysłane hasła zamówień, więc ustaw raz.
 
 ## 3. Płatności kartą (Stripe)
 1. Załóż konto na **stripe.com** (firma, IBAN do wypłat). Na start możesz zostać w **trybie testowym**.
@@ -74,7 +79,6 @@ Nie ma kont: jest **jeden panel i jedno stałe hasło**, to samo dla Ciebie i sz
 ### Ustawienia w Vercelu (Environment Variables)
 | Nazwa | Wartość |
 |---|---|
-| `SESSION_SECRET` | opcjonalnie, losowe 40+ znaków (punkt 2) |
 | `ADMIN_PASSWORD` | hasło do panelu, 8+ znaków (na czas budowy niepotrzebne, patrz niżej) |
 
 Oraz **baza danych** (punkt 1).

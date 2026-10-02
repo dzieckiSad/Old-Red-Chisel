@@ -1,19 +1,37 @@
 import "server-only";
 import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes, randomInt, scrypt, timingSafeEqual } from "node:crypto";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import path from "node:path";
 import { promisify } from "node:util";
 import { databaseUrl } from "@/lib/db";
+import { dataDir, isServerless } from "@/lib/runtime";
 
 const scryptAsync = promisify(scrypt) as (pw: string, salt: Buffer, len: number) => Promise<Buffer>;
 
+/**
+ * Signing key. With an external database it's derived from DATABASE_URL (which holds the database
+ * password, so it is just as secret). Otherwise a random key is created once in the data directory.
+ */
+let cachedSecret: string | undefined;
 function secret() {
-  const value = process.env.SESSION_SECRET;
-  if (value && value.length >= 32) return value;
-  // Without SESSION_SECRET, derive one from the database URL: it holds the database password,
-  // so it is just as secret and already set in Vercel. Rotating the database password signs everyone out.
+  if (cachedSecret) return cachedSecret;
   const db = databaseUrl();
-  if (db) return createHash("sha256").update(`orc-session-v1:${db}`).digest("base64url");
-  if (process.env.VERCEL) throw new Error("SESSION_SECRET or a database must be set.");
-  return "local-development-secret-do-not-use-in-production";
+  if (db) return (cachedSecret = createHash("sha256").update(`orc-session-v1:${db}`).digest("base64url"));
+  if (isServerless()) throw new Error("DATABASE_URL is not set.");
+  const file = path.join(dataDir(), "secret.key");
+  try {
+    cachedSecret = readFileSync(file, "utf8").trim();
+  } catch {
+    mkdirSync(dataDir(), { recursive: true });
+    const fresh = randomBytes(48).toString("base64url");
+    try {
+      writeFileSync(file, fresh, { mode: 0o600, flag: "wx" });
+      cachedSecret = fresh;
+    } catch {
+      cachedSecret = readFileSync(file, "utf8").trim(); // another worker created it first
+    }
+  }
+  return cachedSecret;
 }
 
 // ---------- Passwords ----------

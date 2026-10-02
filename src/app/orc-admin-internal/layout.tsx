@@ -43,7 +43,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <div className="mx-auto max-w-xl border border-line bg-white p-6 sm:p-8">
             <SketchIcon name="clipboard" size={48} />
             <h1 className="mt-2 font-serif text-2xl font-semibold">Almost there</h1>
-            <p className="mt-2 text-sm text-graphite">The panel needs these settings in Vercel. Add them, then Deployments → ⋯ → Redeploy.</p>
+            <p className="mt-2 text-sm text-graphite">The panel needs these settings. Add them to the server&apos;s environment variables, then restart or redeploy.</p>
             <ul className="mt-5 space-y-3">
               {issues.map((i) => (
                 <li key={i.name} className="border-l-4 border-brand bg-cream p-3 text-sm">

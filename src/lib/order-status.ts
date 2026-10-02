@@ -54,3 +54,22 @@ export function formatDate(value: string | Date | null) {
   const d = typeof value === "string" ? new Date(`${value}T12:00:00`) : value;
   return new Intl.DateTimeFormat("en-IE", { weekday: "long", day: "numeric", month: "long" }).format(d);
 }
+
+/** How a manually added order was (or will be) paid. Stored as `manual:<key>` in paymentRef. */
+export const manualPayments = {
+  paid_cash: "Paid in cash",
+  paid_transfer: "Paid by bank transfer",
+  paid_card: "Paid by card in person",
+  deposit: "Deposit paid, balance due",
+  due: "To pay on delivery or collection",
+} as const;
+export type ManualPayment = keyof typeof manualPayments;
+
+/** Customer-facing payment line, and whether the order is fully paid. */
+export function paymentSummary(paymentRef: string | null): { label: string; paid: boolean } {
+  if (paymentRef?.startsWith("manual:")) {
+    const key = paymentRef.slice(7) as ManualPayment;
+    return { label: manualPayments[key] ?? "Arranged with the workshop", paid: key.startsWith("paid_") };
+  }
+  return { label: "Paid online by card", paid: true };
+}

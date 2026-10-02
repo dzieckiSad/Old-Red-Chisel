@@ -7,7 +7,7 @@ Po każdej zmianie zmiennych: **Deployments → ⋯ → Redeploy**.
 Dopóki czegoś brakuje, strona działa bezpiecznie:
 - bez bazy danych i Stripe sklep pokazuje „Online payment opens soon” i numer telefonu,
 - bez kluczy Stripe przycisk testowej płatności działa tylko lokalnie, nigdy w Vercelu,
-- panel admina działa tylko z bazą danych i ustawionymi kluczami (punkt 5).
+- bez bazy danych `/admin` pokazuje listę brakujących ustawień (punkt 5).
 
 ## 1. Baza danych (Neon, darmowa)
 1. Vercel → projekt → **Storage → Create Database → Neon (Serverless Postgres)** → plan Free → region **Europe (Frankfurt lub London)**.
@@ -45,50 +45,36 @@ Bez własnej domeny Resend wysyła tylko na Twój własny adres (do testów).
 
 ## 5. Panel admina
 
-Logowanie zawsze wymaga **e-maila, hasła i 6-cyfrowego kodu** z aplikacji w telefonie
-(Google Authenticator lub Microsoft Authenticator). Do panelu prowadzą dwie drogi:
-
-### Teraz, w trakcie budowy: prosty adres
-`https://oldredchisel.vercel.app/admin`. Tymczasowe, na Twoją prośbę. Przed startem strony zostanie
-wyłączone (jedna linia w `src/lib/admin-config.ts`) i zostanie tylko wejście z terminala.
-
-### Docelowo: tylko z terminala na Twoim PC
-Tajny adres panelu bez przepustki pokazuje zwykłe 404. Przepustkę daje polecenie `npm run admin`
-uruchomione na Twoim komputerze: tworzy jednorazowy link ważny 2 minuty i otwiera przeglądarkę.
-Przepustka działa w tej przeglądarce 12 godzin; potem logujesz się hasłem i kodem z aplikacji.
+Adres: **`https://oldredchisel.vercel.app/admin`** (później Twoja domena + `/admin`). Znacie go Ty i szef.
+Na czas budowy strony logujesz się **e-mailem i hasłem**. Przed startem włączymy logowanie dwuetapowe
+(`TEMP_ADMIN_2FA_OFF` w `src/lib/admin-config.ts`): przy następnym logowaniu panel sam pokaże kod QR
+do zeskanowania aplikacją Google Authenticator lub Microsoft Authenticator.
 
 ### Ustawienia w Vercelu (Environment Variables)
 | Nazwa | Wartość |
 |---|---|
 | `SESSION_SECRET` | losowe 40+ znaków (punkt 2) |
-| `ADMIN_SETUP_KEY` | losowe 16+ znaków, potrzebne raz przy zakładaniu konta |
-| `ADMIN_PATH` | tajny adres panelu, np. `warsztat-7k2q-mf9x` (12+ znaków: litery, cyfry, `-`) |
-| `ADMIN_ACCESS_KEY` | losowe 32+ znaków, klucz do podpisywania przepustek z terminala |
+| `ADMIN_SETUP_KEY` | losowe 16+ znaków, potrzebne raz przy zakładaniu pierwszego konta |
 
-Do prostego adresu `/admin` wystarczą `SESSION_SECRET`, `ADMIN_SETUP_KEY` i **baza danych (punkt 1)**.
+Oraz **baza danych** (punkt 1).
 
 ### Pierwsze uruchomienie
-1. Ustaw zmienne, zrób Redeploy, otwórz `/admin`.
-2. Wpisz `ADMIN_SETUP_KEY`, swój e-mail i hasło (12+ znaków).
-3. Zeskanuj kod QR aplikacją w telefonie i wpisz 6 cyfr. Konto można założyć tylko raz.
+1. Ustaw bazę danych i obie zmienne, zrób Redeploy, otwórz `/admin`.
+   Jeśli czegoś brakuje, `/admin` pokaże listę „Almost there” z tym, co dodać.
+2. Wpisz `ADMIN_SETUP_KEY`, swój e-mail i hasło (12+ znaków). Pierwsze konto można założyć tylko raz.
 
-### Wejście z terminala (PC)
-Jednorazowo na komputerze: zainstaluj Node.js (20+) i Git, pobierz repozytorium
-(`git clone …`, `npm install`), a obok `package.json` utwórz plik `.env.admin`:
-```
-ADMIN_SITE_URL=https://oldredchisel.vercel.app
-ADMIN_PATH=<ten sam co w Vercelu>
-ADMIN_ACCESS_KEY=<ten sam co w Vercelu>
-```
-Potem za każdym razem: `npm run admin`. Plik `.env.admin` nie trafia do repozytorium.
+### Kilka osób (np. Ty i szef)
+Panel → **Team** → **Add a person**: e-mail i hasło startowe (przekaż je osobiście). Każdy loguje się swoim kontem
+i może zmienić hasło w **Team → My password**. Tam też odbierasz dostęp (**Remove access**).
 
 ### Zabezpieczenia panelu
-- adres wewnętrzny z kodu oraz tajny adres bez przepustki zwracają 404,
-- przepustka jest podpisana kluczem, ważna 2 minuty i działa tylko raz,
-- hasło zaszyfrowane (scrypt), sekret aplikacji 2FA zaszyfrowany w bazie,
+- każda strona i akcja panelu wymaga zalogowania; wewnętrzny adres panelu z kodu zwraca 404,
+- hasła są zaszyfrowane (scrypt),
 - po 5 błędnych logowaniach na e-mail (10 na adres IP) blokada na 15 minut,
-- sesja wygasa po 8 godzinach, ciasteczka działają tylko pod adresem panelu,
-- **repozytorium ustaw jako prywatne** (GitHub → Settings → Danger Zone → Change visibility).
+- sesja wygasa po 8 godzinach, ciasteczko działa tylko pod `/admin`,
+- **repozytorium ustaw jako prywatne**: GitHub → repozytorium `Old-Red-Chisel` → **Settings** (zakładka u góry,
+  na telefonie w menu „…”) → na samym dole **Danger Zone** → **Change visibility** → **Make private** → potwierdź nazwą repozytorium.
+  Vercel dalej działa; jeśli poprosi o dostęp, zatwierdź go w GitHub → Settings → Applications → Vercel.
 
 ## Produkty w panelu
 Panel → **Products**:
@@ -100,6 +86,16 @@ Panel → **Products**:
 - usuwanie na dole strony produktu (kasuje też zdjęcia).
 Przykładowe produkty zostały wczytane jako widoczne. Zmień je albo ukryj.
 Opcje z dopłatami (drewno, wykończenie) są na razie ustawione w kodzie.
+
+## Ręczne zamówienia (klient nie płaci przez stronę)
+Panel → **Orders → + New order**: dla zamówień przez telefon albo na miejscu.
+- dane klienta, dostawa lub odbiór, pozycje: produkt ze sklepu albo dowolna pozycja
+  (np. „Szafa wnękowa, zaliczka”) z ceną, ilością i szczegółami,
+- płatność: gotówka, przelew, karta na miejscu, zaliczka (reszta później) albo płatność przy dostawie/odbiorze,
+- status, przewidywana data i notatka dla klienta.
+Po zapisaniu panel pokazuje **numer zamówienia i hasło** (i może je wysłać mailem). Klient loguje się nimi
+na stronie **Track your order** tak samo jak przy zamówieniu online.
+Gdy klient zgubi hasło: otwórz zamówienie → **Customer access → Generate new password**.
 
 ## Jak działa zamówienie (dla klienta)
 1. Koszyk → **Checkout**: dane, dostawa/montaż/odbiór, płatność kartą na naszej stronie.

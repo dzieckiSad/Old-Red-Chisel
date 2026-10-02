@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { StatusForm } from "@/components/admin/forms";
+import { CustomerAccess } from "@/components/admin/manual-order-form";
 import { adminBase, currentAdmin } from "@/lib/admin-auth";
 import { getOrder, getOrderEvents } from "@/lib/orders";
-import { deliveryLabels, formatCents, statusLabels } from "@/lib/order-status";
+import { deliveryLabels, formatCents, paymentSummary, statusLabels } from "@/lib/order-status";
 
 export default async function AdminOrderPage({ params }: PageProps<"/orc-admin-internal/orders/[id]">) {
   const base = await adminBase();
@@ -54,7 +55,11 @@ export default async function AdminOrderPage({ params }: PageProps<"/orc-admin-i
                 </>
               )}
               {order.notes && (<><dt className="text-graphite">Notes</dt><dd>{order.notes}</dd></>)}
-              <dt className="text-graphite">Payment</dt><dd className="font-mono text-xs">{order.paymentRef ?? "—"}</dd>
+              <dt className="text-graphite">Payment</dt>
+              <dd>
+                {paymentSummary(order.paymentRef).label}
+                {order.paymentRef && !order.paymentRef.startsWith("manual:") && <span className="block font-mono text-xs text-graphite">{order.paymentRef}</span>}
+              </dd>
             </dl>
           </Section>
           <Section title="History">
@@ -70,9 +75,15 @@ export default async function AdminOrderPage({ params }: PageProps<"/orc-admin-i
             </ol>
           </Section>
         </div>
+        <div className="space-y-6">
         <Section title="Update">
           <StatusForm version={order.updatedAt.toISOString()} orderId={order.id} status={order.status} etaDate={order.etaDate} note={order.statusNote} />
         </Section>
+        <Section title="Customer access">
+          <p className="text-sm text-graphite">What the customer uses at /track.</p>
+          <CustomerAccess orderId={order.id} code={order.code} />
+        </Section>
+        </div>
       </div>
     </>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { type FormEvent, startTransition, useActionState } from "react";
 import { type FormState, loginAdmin, saveOrderStatus, setupAdmin } from "@/app/orc-admin-internal/actions";
 import { SketchIcon } from "@/components/sketch/icons";
 import type { OrderStatus } from "@/lib/db/schema";
@@ -14,12 +14,44 @@ function ErrorNote({ state }: { state: FormState }) {
   return <p role="alert" className="border-l-4 border-brand bg-brand/5 p-3 text-sm text-brand-dark">{state.error}</p>;
 }
 
-export function SetupForm({ totpSealed, qrSvg, secret }: { totpSealed: string; qrSvg: string; secret: string }) {
+function Authenticator({ qrSvg, secret, sealedName, sealed }: { qrSvg: string; secret: string; sealedName: string; sealed: string }) {
+  return (
+    <div className="grid items-center gap-5 border border-line bg-cream/60 p-4 sm:grid-cols-[180px_1fr]">
+      <input type="hidden" name={sealedName} value={sealed} />
+      <div className="bg-white p-2" dangerouslySetInnerHTML={{ __html: qrSvg }} />
+      <div className="text-sm">
+        <p className="font-semibold">Scan with your authenticator app</p>
+        <p className="mt-1 text-graphite">Google Authenticator, Microsoft Authenticator or 1Password. Or type this key:</p>
+        <p className="mt-2 font-mono text-xs break-all">{secret}</p>
+        <CodeField />
+      </div>
+    </div>
+  );
+}
+
+function CodeField() {
+  return (
+    <label className="mt-4 block text-sm font-medium">
+      6-digit code from the app
+      <input name="code" required inputMode="numeric" pattern="\d{6}" maxLength={6} autoComplete="one-time-code" className={`${adminInput} font-mono text-lg tracking-[0.4em]`} />
+    </label>
+  );
+}
+
+/** Submits without React's automatic form reset, so typed values survive an error. */
+function useNoResetSubmit(action: (data: FormData) => void) {
+  return (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const data = new FormData(e.currentTarget);
+    startTransition(() => action(data));
+  };
+}
+
+export function SetupForm({ twoFactor }: { twoFactor: { sealed: string; qrSvg: string; secret: string } | null }) {
   const [state, action, pending] = useActionState(setupAdmin, {});
   return (
-    <form action={action} className="space-y-5">
+    <form onSubmit={useNoResetSubmit(action)} className="space-y-5">
       <ErrorNote state={state} />
-      <input type="hidden" name="totpSealed" value={totpSealed} />
       <label className="block text-sm font-medium">
         Setup key <span className="font-normal text-graphite">(ADMIN_SETUP_KEY from Vercel)</span>
         <input name="setupKey" type="password" required autoComplete="off" className={adminInput} />
@@ -38,18 +70,7 @@ export function SetupForm({ totpSealed, qrSvg, secret }: { totpSealed: string; q
           <input name="password2" type="password" required minLength={12} autoComplete="new-password" className={adminInput} />
         </label>
       </div>
-      <div className="grid items-center gap-5 border border-line bg-cream/60 p-4 sm:grid-cols-[180px_1fr]">
-        <div className="bg-white p-2" dangerouslySetInnerHTML={{ __html: qrSvg }} />
-        <div className="text-sm">
-          <p className="font-semibold">Scan with your authenticator app</p>
-          <p className="mt-1 text-graphite">Google Authenticator, Microsoft Authenticator or 1Password. Or type this key:</p>
-          <p className="mt-2 font-mono text-xs break-all">{secret}</p>
-          <label className="mt-4 block font-medium">
-            6-digit code from the app
-            <input name="code" required inputMode="numeric" pattern="\d{6}" maxLength={6} autoComplete="one-time-code" className={`${adminInput} font-mono text-lg tracking-[0.4em]`} />
-          </label>
-        </div>
-      </div>
+      {twoFactor && <Authenticator {...twoFactor} sealedName="totpSealed" />}
       <button type="submit" disabled={pending} className="btn btn--primary w-full disabled:opacity-60">
         {pending ? "Saving…" : "Create admin account"}
       </button>
@@ -57,23 +78,27 @@ export function SetupForm({ totpSealed, qrSvg, secret }: { totpSealed: string; q
   );
 }
 
-export function LoginForm() {
+export function LoginForm({ twoFactor }: { twoFactor: boolean }) {
   const [state, action, pending] = useActionState(loginAdmin, {});
   return (
-    <form action={action} className="space-y-5">
+    <form onSubmit={useNoResetSubmit(action)} className="space-y-5">
       <ErrorNote state={state} />
       <label className="block text-sm font-medium">
         Email
-        <input name="email" type="email" required autoComplete="username" defaultValue={state.email} key={state.email} className={adminInput} />
+        <input name="email" type="email" required autoComplete="username" className={adminInput} />
       </label>
       <label className="block text-sm font-medium">
         Password
         <input name="password" type="password" required autoComplete="current-password" className={adminInput} />
       </label>
-      <label className="block text-sm font-medium">
-        Code from your authenticator app
-        <input name="code" required inputMode="numeric" pattern="\d{6}" maxLength={6} autoComplete="one-time-code" className={`${adminInput} font-mono text-lg tracking-[0.4em]`} />
-      </label>
+      {state.enroll ? (
+        <>
+          <p className="text-sm text-graphite">Two-step sign-in is now on. Add this account to your authenticator app once:</p>
+          <Authenticator {...state.enroll} sealedName="enrollSealed" />
+        </>
+      ) : (
+        twoFactor && <CodeField />
+      )}
       <button type="submit" disabled={pending} className="btn btn--dark w-full disabled:opacity-60">
         {pending ? "Checking…" : "Sign in"}
       </button>

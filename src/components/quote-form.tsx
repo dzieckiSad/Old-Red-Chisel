@@ -9,7 +9,7 @@ import { site } from "@/lib/site";
 const steps = ["Your project", "Details", "Contact"] as const;
 
 const inputClass =
-  "mt-1 block w-full rounded-md border border-line bg-white px-3 py-2.5 text-ink focus:border-ink focus:outline-none";
+  "mt-1 block w-full border border-line bg-white px-3 py-2.5 text-ink focus:border-ink focus:outline-none";
 
 // Phone photos are often 3–8 MB; shrink them in the browser so several fit in one request.
 async function shrinkImage(file: File, maxSide = 1600): Promise<File> {
@@ -55,7 +55,7 @@ export function QuoteForm({
 
   if (state.status === "success") {
     return (
-      <div className="rounded-lg border border-line bg-white p-8">
+      <div className="border border-line bg-white p-8">
         <h2 className="font-serif text-2xl font-semibold text-ink">
           Thanks{state.name ? `, ${state.name}` : ""}. We&apos;ve got your request.
         </h2>
@@ -112,7 +112,7 @@ export function QuoteForm({
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate={false} className="rounded-lg border border-line bg-white p-6 sm:p-8">
+    <form onSubmit={onSubmit} noValidate={false} className="border border-line bg-white p-6 sm:p-8">
       <ol className="mb-8 flex gap-2 text-sm">
         {steps.map((label, i) => (
           <li
@@ -126,7 +126,7 @@ export function QuoteForm({
       </ol>
 
       {state.status === "error" && (
-        <p role="alert" className="mb-6 rounded-md bg-red-50 p-3 text-sm text-red-800">
+        <p role="alert" className="mb-6 bg-red-50 p-3 text-sm text-red-800">
           {state.message}
         </p>
       )}
@@ -141,7 +141,7 @@ export function QuoteForm({
           {projectTypes.map((t) => (
             <label
               key={t.value}
-              className={`cursor-pointer rounded-md border p-4 font-medium ${
+              className={`cursor-pointer border p-4 font-medium ${
                 projectType === t.value ? "border-brand bg-brand/5 text-ink" : "border-line hover:border-ink/40"
               }`}
             >
@@ -164,7 +164,7 @@ export function QuoteForm({
       <fieldset ref={(el) => { stepRefs.current[1] = el; }} hidden={step !== 1} className="space-y-5">
         <legend className="font-serif text-2xl font-semibold text-ink">Tell us about the job</legend>
         {product && (
-          <p className="rounded-md bg-sand px-3 py-2 text-sm">
+          <p className="bg-sand px-3 py-2 text-sm">
             Based on: <strong>{product.name}</strong>
           </p>
         )}
@@ -181,7 +181,7 @@ export function QuoteForm({
         <label className="block text-sm font-medium">
           Photos of the space <span className="font-normal text-graphite">(optional, up to {MAX_PHOTOS})</span>
           <input type="file" name="photos" accept="image/*" multiple onChange={onPhotos}
-            className="mt-1 block w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-sand file:px-4 file:py-2 file:font-semibold" />
+            className="mt-1 block w-full text-sm file:mr-3 file: file:border-0 file:bg-sand file:px-4 file:py-2 file:font-semibold" />
           <span className="mt-1 block text-xs text-graphite">{photoNote}</span>
           <FieldError message={errors.photos} />
         </label>
@@ -252,18 +252,18 @@ export function QuoteForm({
 
       <div className="mt-8 flex items-center justify-between gap-3">
         {step > 0 ? (
-          <button type="button" onClick={() => setStep((s) => s - 1)} className="rounded-md px-4 py-3 text-sm font-semibold text-graphite hover:text-ink">
+          <button type="button" onClick={() => setStep((s) => s - 1)} className="px-4 py-3 text-sm font-semibold text-graphite hover:text-ink">
             ← Back
           </button>
         ) : (
           <span />
         )}
         {step < steps.length - 1 ? (
-          <button type="button" onClick={goNext} className="rounded-md bg-ink px-6 py-3 text-sm font-semibold text-white hover:bg-ink/90">
+          <button type="button" onClick={goNext} className="btn btn--dark">
             Continue
           </button>
         ) : (
-          <button type="submit" disabled={pending} className="rounded-md bg-brand px-6 py-3 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-60">
+          <button type="submit" disabled={pending} className="btn btn--primary disabled:opacity-60">
             {pending ? "Sending…" : "Send my request"}
           </button>
         )}

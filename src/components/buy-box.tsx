@@ -25,7 +25,7 @@ export function BuyBox({ product }: { product: Product }) {
 
   if (product.mode === "quote_only") {
     return (
-      <div className="rounded-lg border border-line bg-white p-5">
+      <div className="border border-line bg-white p-5">
         <p className="text-sm text-graphite">Typical price</p>
         <p className="font-serif text-3xl font-semibold text-ink">from {formatPrice(product.price)}</p>
         <p className="mt-2 text-sm text-graphite">
@@ -33,7 +33,7 @@ export function BuyBox({ product }: { product: Product }) {
         </p>
         <Link
           href={quoteHref}
-          className="mt-5 flex w-full items-center justify-center rounded-md bg-brand px-5 py-3 font-semibold text-white hover:bg-brand-dark"
+          className="btn btn--primary mt-5 w-full !text-base"
         >
           Request a quote
         </Link>
@@ -42,7 +42,7 @@ export function BuyBox({ product }: { product: Product }) {
   }
 
   return (
-    <div className="rounded-lg border border-line bg-white p-5">
+    <div className="border border-line bg-white p-5">
       <div className="flex items-baseline justify-between">
         <p className="font-serif text-3xl font-semibold text-ink">{formatPrice(price)}</p>
         <span
@@ -64,7 +64,7 @@ export function BuyBox({ product }: { product: Product }) {
               return (
                 <label
                   key={choice.label}
-                  className={`cursor-pointer rounded-md border px-3 py-2 text-sm ${
+                  className={`cursor-pointer border px-3 py-2 text-sm ${
                     checked ? "border-ink bg-ink text-white" : "border-line hover:border-ink/40"
                   }`}
                 >
@@ -97,7 +97,7 @@ export function BuyBox({ product }: { product: Product }) {
           addToCart({ slug: product.slug, name: product.name, unitPrice: price, options: selected });
           setAdded(true);
         }}
-        className="mt-6 w-full rounded-md bg-brand px-5 py-3 font-semibold text-white hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
+        className="btn btn--primary mt-6 w-full !text-base disabled:cursor-not-allowed disabled:opacity-50"
       >
         Add to cart
       </button>
@@ -114,7 +114,7 @@ export function BuyBox({ product }: { product: Product }) {
 
       <Link
         href={quoteHref}
-        className="mt-2 block rounded-md border border-dashed border-line p-3 text-sm text-graphite hover:border-brand"
+        className="mt-2 block border border-dashed border-line p-3 text-sm text-graphite hover:border-brand"
       >
         <span className="font-semibold text-ink">Need a different size or design?</span> We make
         every piece ourselves, so we can build it to your measurements. →

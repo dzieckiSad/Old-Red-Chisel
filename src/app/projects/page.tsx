@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { CtaBand } from "@/components/sections";
+import { BeforeAfter } from "@/components/sketch/before-after";
+import { Frame } from "@/components/sketch/ornaments";
+import { Reveal } from "@/components/sketch/reveal";
 import { Container, PageHeader, PhotoPlaceholder } from "@/components/ui";
 
 export const metadata: Metadata = {
@@ -25,17 +28,21 @@ export default function ProjectsPage() {
         title="Recent work"
         intro="Every project here was built in our workshop and fitted by our own team. More photos coming soon."
       />
-      <Container className="grid gap-8 py-12 md:grid-cols-2 lg:grid-cols-3">
-        {projects.map((p) => (
-          <article key={p.title}>
-            <div className="grid grid-cols-2 gap-2">
-              <PhotoPlaceholder label="Before" className="aspect-square" />
-              <PhotoPlaceholder label="After" className="aspect-square" />
-            </div>
-            <p className="mt-3 text-xs font-semibold tracking-wider text-brand uppercase">{p.type}</p>
+      <Container className="grid gap-x-8 gap-y-12 py-14 md:grid-cols-2 lg:grid-cols-3">
+        {projects.map((p, i) => (
+          <Reveal as="article" key={p.title} delay={(i % 3) * 90}>
+            <Frame>
+              <BeforeAfter
+                className="aspect-[4/3]"
+                label={`${p.title}: before and after`}
+                before={<div className="plaster-placeholder h-full w-full" />}
+                after={<PhotoPlaceholder className="h-full w-full" />}
+              />
+            </Frame>
+            <p className="mt-4 text-xs font-semibold tracking-wider text-brand uppercase">{p.type}</p>
             <h2 className="mt-1 font-semibold text-ink">{p.title}</h2>
-            <p className="text-sm text-graphite">{p.place}</p>
-          </article>
+            <p className="font-hand text-xl leading-tight text-graphite">{p.place}</p>
+          </Reveal>
         ))}
       </Container>
       <CtaBand title="Want something like this?" />

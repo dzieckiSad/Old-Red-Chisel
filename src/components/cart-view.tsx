@@ -9,7 +9,7 @@ export function CartView() {
 
   if (cart.length === 0) {
     return (
-      <div className="rounded-lg border border-line bg-white p-8 text-center">
+      <div className="border border-line bg-white p-8 text-center">
         <p className="text-graphite">Your cart is empty.</p>
         <Link href="/shop" className="mt-4 inline-block font-semibold text-brand hover:underline">
           Browse the shop →
@@ -20,7 +20,7 @@ export function CartView() {
 
   return (
     <div className="grid gap-10 md:grid-cols-[2fr_1fr]">
-      <ul className="divide-y divide-line rounded-lg border border-line bg-white">
+      <ul className="divide-y divide-line border border-line bg-white">
         {cart.map((item) => (
           <li key={item.key} className="flex flex-wrap items-center justify-between gap-4 p-5">
             <div>
@@ -36,7 +36,7 @@ export function CartView() {
               )}
             </div>
             <div className="flex items-center gap-4">
-              <div className="flex items-center rounded-md border border-line">
+              <div className="flex items-center border border-line">
                 <button
                   type="button"
                   aria-label={`Decrease quantity of ${item.name}`}
@@ -68,7 +68,7 @@ export function CartView() {
         ))}
       </ul>
 
-      <aside className="h-fit rounded-lg border border-line bg-white p-5">
+      <aside className="h-fit border border-line bg-white p-5">
         <div className="flex justify-between text-lg font-semibold">
           <span>Subtotal</span>
           <span>{formatPrice(cartTotal(cart))}</span>
@@ -83,7 +83,7 @@ export function CartView() {
         <button
           type="button"
           disabled
-          className="mt-5 w-full cursor-not-allowed rounded-md bg-brand px-5 py-3 font-semibold text-white opacity-50"
+          className="btn btn--primary mt-5 w-full cursor-not-allowed opacity-50"
         >
           Checkout (coming soon)
         </button>

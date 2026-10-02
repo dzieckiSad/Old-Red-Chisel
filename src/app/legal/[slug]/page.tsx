@@ -53,7 +53,7 @@ export default async function LegalPage({ params }: PageProps<"/legal/[slug]">) 
     <>
       <PageHeader eyebrow="Help" title={page.title} />
       <Container className="max-w-3xl space-y-4 py-12 text-graphite">
-        <p className="rounded-md bg-sand px-3 py-2 text-sm">Draft: full wording to follow.</p>
+        <p className="bg-sand px-3 py-2 text-sm">Draft: full wording to follow.</p>
         {page.body.map((p) => <p key={p}>{p}</p>)}
       </Container>
     </>

@@ -1,9 +1,12 @@
+import type { IconName } from "@/components/sketch/icons";
+
 // Service pages. Prices are "from" figures used to set expectations; TODO confirm with the owner.
 
 export type Service = {
   slug: string;
   group: "bespoke" | "build";
   name: string;
+  icon: IconName;
   summary: string;
   fromPrice?: string;
   includes: string[];
@@ -14,6 +17,7 @@ export const services: Service[] = [
     slug: "kitchens",
     group: "bespoke",
     name: "Bespoke kitchens",
+    icon: "kitchen",
     summary:
       "Kitchens designed, built and fitted by us: from the first measure to the last handle.",
     fromPrice: "from €8,500",
@@ -28,6 +32,7 @@ export const services: Service[] = [
     slug: "fitted-wardrobes",
     group: "bespoke",
     name: "Fitted wardrobes & walk-ins",
+    icon: "wardrobe",
     summary: "Floor-to-ceiling wardrobes and dressing rooms built into any room, slope or alcove.",
     fromPrice: "from €1,800",
     includes: [
@@ -41,6 +46,7 @@ export const services: Service[] = [
     slug: "alcove-media-units",
     group: "bespoke",
     name: "Alcove & media units",
+    icon: "shelving",
     summary: "Built-in cabinets and shelving for alcoves, chimney breasts and TV walls.",
     fromPrice: "from €950",
     includes: [
@@ -54,6 +60,7 @@ export const services: Service[] = [
     slug: "under-stairs-attic",
     group: "bespoke",
     name: "Under-stairs & attic storage",
+    icon: "stairs",
     summary: "Pull-out drawers, cupboards and shelving that use every centimetre of awkward space.",
     fromPrice: "from €1,200",
     includes: [
@@ -67,6 +74,7 @@ export const services: Service[] = [
     slug: "home-office-bathroom",
     group: "bespoke",
     name: "Home office, bathroom & more",
+    icon: "desk",
     summary: "Desks, vanity units, boot rooms and anything else that needs to fit exactly.",
     includes: [
       "Built-in desks and office storage",
@@ -79,6 +87,7 @@ export const services: Service[] = [
     slug: "interior",
     group: "build",
     name: "Interior renovation & fit-out",
+    icon: "interior",
     summary: "Complete interior work, from a single room to a whole house.",
     includes: [
       "Flooring, skirting and architraves",
@@ -91,6 +100,7 @@ export const services: Service[] = [
     slug: "exterior",
     group: "build",
     name: "Exterior & garden",
+    icon: "exterior",
     summary: "Decking, fencing, garden rooms and outdoor structures built for the Irish weather.",
     fromPrice: "decking from €95/m²",
     includes: [
@@ -104,6 +114,7 @@ export const services: Service[] = [
     slug: "extensions-conversions",
     group: "build",
     name: "Extensions & conversions",
+    icon: "extension",
     summary: "Extensions, attic and garage conversions managed from start to finish.",
     includes: [
       "Single-storey extensions",
@@ -116,6 +127,7 @@ export const services: Service[] = [
     slug: "small-jobs",
     group: "build",
     name: "Small jobs",
+    icon: "hammer",
     summary: "No job too small: repairs, doors, shelves, skirting and the odd jobs that never get done.",
     includes: [
       "Door hanging and repairs",

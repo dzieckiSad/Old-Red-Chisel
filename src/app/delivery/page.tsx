@@ -22,7 +22,7 @@ export default function DeliveryPage() {
         intro="We deliver with our own van, so your piece arrives with the people who made it. Assembly is optional."
       />
       <Container className="py-12">
-        <div className="overflow-x-auto rounded-lg border border-line bg-white">
+        <div className="overflow-x-auto border border-line bg-white">
           <table className="w-full text-left text-sm">
             <thead className="border-b border-line bg-sand/60">
               <tr>

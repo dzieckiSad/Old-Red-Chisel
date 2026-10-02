@@ -46,7 +46,7 @@ export function Header() {
         <div className="flex items-center gap-2">
           <Link
             href="/cart"
-            className="relative rounded-md px-3 py-2 text-sm font-medium text-ink hover:bg-sand"
+            className="relative px-3 py-2 text-sm font-medium text-ink hover:bg-sand"
           >
             Cart
             {count > 0 && (
@@ -57,13 +57,13 @@ export function Header() {
           </Link>
           <Link
             href="/quote"
-            className="hidden rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark sm:inline-flex"
+            className="btn btn--primary hidden !px-4 !py-2.5 sm:inline-flex"
           >
             Free quote
           </Link>
           <button
             type="button"
-            className="rounded-md px-3 py-2 text-sm font-medium lg:hidden"
+            className="px-3 py-2 text-sm font-medium lg:hidden"
             aria-expanded={open}
             aria-controls="mobile-nav"
             onClick={() => setOpen((v) => !v)}
@@ -89,7 +89,7 @@ export function Header() {
             <Link
               href="/quote"
               onClick={() => setOpen(false)}
-              className="my-3 rounded-md bg-brand px-4 py-3 text-center font-semibold text-white"
+              className="btn btn--primary my-3"
             >
               Get a free quote
             </Link>

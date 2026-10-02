@@ -1,30 +1,38 @@
 import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
+import { SketchIcon } from "@/components/sketch/icons";
 
 export function Container({ className = "", ...props }: ComponentProps<"div">) {
   return <div className={`mx-auto w-full max-w-6xl px-4 sm:px-6 ${className}`} {...props} />;
 }
 
-const buttonStyles = {
-  primary: "bg-brand text-white hover:bg-brand-dark",
-  secondary: "border border-ink/20 bg-white text-ink hover:border-ink/40",
-  light: "bg-white text-ink hover:bg-sand",
-};
+type ButtonVariant = "primary" | "outline" | "light" | "dark";
 
-type ButtonLinkProps = ComponentProps<typeof Link> & { variant?: keyof typeof buttonStyles };
+type ButtonLinkProps = ComponentProps<typeof Link> & { variant?: ButtonVariant; arrow?: boolean };
 
-export function ButtonLink({ variant = "primary", className = "", ...props }: ButtonLinkProps) {
+export function ButtonLink({ variant = "primary", arrow, className = "", children, ...props }: ButtonLinkProps) {
   return (
-    <Link
-      className={`inline-flex items-center justify-center rounded-md px-5 py-3 text-sm font-semibold transition-colors ${buttonStyles[variant]} ${className}`}
-      {...props}
-    />
+    <Link className={`btn btn--${variant} ${className}`} {...props}>
+      {children}
+      {arrow && <ButtonArrow />}
+    </Link>
+  );
+}
+
+export function ButtonArrow() {
+  return (
+    <svg className="btn__arrow" viewBox="0 0 20 12" width="18" height="11" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 6h17 M13 1l5 5-5 5" />
+    </svg>
   );
 }
 
 export function Eyebrow({ children }: { children: ReactNode }) {
   return (
-    <p className="text-xs font-semibold tracking-[0.18em] text-brand uppercase">{children}</p>
+    <p className="flex items-center gap-2.5 text-xs font-semibold tracking-[0.18em] text-brand uppercase">
+      <span aria-hidden className="h-0.5 w-6 bg-brand" />
+      {children}
+    </p>
   );
 }
 
@@ -35,7 +43,7 @@ export function SectionHeading({
   align = "left",
 }: {
   eyebrow?: string;
-  title: string;
+  title: ReactNode;
   intro?: string;
   align?: "left" | "center";
 }) {
@@ -48,7 +56,7 @@ export function SectionHeading({
   );
 }
 
-export function PageHeader({ eyebrow, title, intro }: { eyebrow?: string; title: string; intro?: string }) {
+export function PageHeader({ eyebrow, title, intro }: { eyebrow?: string; title: ReactNode; intro?: string }) {
   return (
     <div className="border-b border-line bg-sand/60">
       <Container className="py-12 sm:py-16">
@@ -66,10 +74,10 @@ export function PhotoPlaceholder({ label, className = "" }: { label?: string; cl
     <div
       role="img"
       aria-label={label ?? "Photo coming soon"}
-      className={`wood-placeholder flex items-end rounded-lg ${className}`}
+      className={`wood-placeholder flex items-end ${className}`}
     >
       {label && (
-        <span className="m-3 rounded bg-ink/60 px-2 py-1 text-xs font-medium text-white">{label}</span>
+        <span className="m-3 bg-ink/60 px-2 py-1 text-xs font-medium text-white">{label}</span>
       )}
     </div>
   );
@@ -80,9 +88,7 @@ export function CheckList({ items }: { items: string[] }) {
     <ul className="space-y-2">
       {items.map((item) => (
         <li key={item} className="flex gap-3 text-graphite">
-          <span aria-hidden className="mt-1 text-brand">
-            ✓
-          </span>
+          <SketchIcon name="tick" size={20} className="mt-0.5" />
           {item}
         </li>
       ))}

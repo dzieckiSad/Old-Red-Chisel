@@ -1,5 +1,9 @@
 import Link from "next/link";
-import { CtaBand, ProcessSteps } from "@/components/sections";
+import { CtaBand, IconCard, ProcessSteps } from "@/components/sections";
+import { BeforeAfter } from "@/components/sketch/before-after";
+import { SketchIcon } from "@/components/sketch/icons";
+import { Frame, SketchCircle } from "@/components/sketch/ornaments";
+import { Reveal } from "@/components/sketch/reveal";
 import { ButtonLink, CheckList, Container, PageHeader, PhotoPlaceholder, SectionHeading } from "@/components/ui";
 import { type Service, getServices } from "@/lib/services";
 
@@ -22,20 +26,19 @@ export function ServiceIndex({
   return (
     <>
       <PageHeader eyebrow={eyebrow} title={title} intro={intro} />
-      <Container className="grid gap-6 py-12 md:grid-cols-2 lg:grid-cols-3">
-        {getServices(group).map((s) => (
-          <Link
-            key={s.slug}
-            href={`${groupPaths[group]}/${s.slug}`}
-            className="group overflow-hidden rounded-lg border border-line bg-white"
-          >
-            <PhotoPlaceholder className="aspect-[3/2] rounded-none" />
-            <div className="p-6">
-              <h2 className="font-serif text-xl font-semibold text-ink group-hover:text-brand">{s.name}</h2>
-              <p className="mt-2 text-graphite">{s.summary}</p>
-              {s.fromPrice && <p className="mt-3 text-sm font-semibold text-ink">{s.fromPrice}</p>}
-            </div>
-          </Link>
+      <Container className="grid gap-x-6 gap-y-10 py-14 md:grid-cols-2 lg:grid-cols-3">
+        {getServices(group).map((s, i) => (
+          <Reveal key={s.slug} delay={(i % 3) * 90}>
+            <IconCard
+              href={`${groupPaths[group]}/${s.slug}`}
+              icon={s.icon}
+              title={s.name}
+              text={s.summary}
+              meta={s.fromPrice}
+              cta="Find out more"
+              headingLevel="h2"
+            />
+          </Reveal>
         ))}
       </Container>
       <section className="bg-white">
@@ -63,11 +66,12 @@ export function ServiceDetail({ service }: { service: Service }) {
         </nav>
         <div className="mt-6 grid gap-10 md:grid-cols-2 md:items-start">
           <div>
-            <h1 className="font-serif text-4xl font-semibold text-ink sm:text-5xl">{service.name}</h1>
+            <SketchIcon name={service.icon} size={64} />
+            <h1 className="mt-3 font-serif text-4xl font-semibold text-ink sm:text-5xl">{service.name}</h1>
             <p className="mt-4 text-lg text-graphite">{service.summary}</p>
             {service.fromPrice && (
-              <p className="mt-4 inline-block rounded-md bg-sand px-3 py-1.5 font-semibold text-ink">
-                {service.fromPrice}
+              <p className="mt-5 text-xl font-semibold text-ink">
+                <SketchCircle>{service.fromPrice}</SketchCircle>
               </p>
             )}
             <div className="mt-8">
@@ -77,18 +81,23 @@ export function ServiceDetail({ service }: { service: Service }) {
               </div>
             </div>
             <div className="mt-8 flex flex-wrap gap-3">
-              <ButtonLink href={`/quote?type=${service.group}&service=${service.slug}`}>Get a free quote</ButtonLink>
-              <ButtonLink href="/projects" variant="secondary">
+              <ButtonLink href={`/quote?type=${service.group}&service=${service.slug}`} arrow>Get a free quote</ButtonLink>
+              <ButtonLink href="/projects" variant="outline">
                 See our work
               </ButtonLink>
             </div>
           </div>
-          <div className="grid gap-3">
-            <PhotoPlaceholder label={`${service.name}: project photo`} className="aspect-[4/3]" />
-            <div className="grid grid-cols-2 gap-3">
-              <PhotoPlaceholder label="Before" className="aspect-square" />
-              <PhotoPlaceholder label="After" className="aspect-square" />
-            </div>
+          <div className="grid gap-4">
+            <Frame caption={`${service.name.toLowerCase()}, Athlone`}>
+              <PhotoPlaceholder className="aspect-[4/3]" />
+            </Frame>
+            <Frame>
+              <BeforeAfter
+                className="aspect-[16/9]"
+                before={<div className="plaster-placeholder h-full w-full" />}
+                after={<PhotoPlaceholder className="h-full w-full" />}
+              />
+            </Frame>
           </div>
         </div>
       </Container>

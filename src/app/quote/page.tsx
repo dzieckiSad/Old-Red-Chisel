@@ -26,7 +26,7 @@ export default async function QuotePage({ searchParams }: PageProps<"/quote">) {
       <Container className="grid gap-10 py-12 lg:grid-cols-[2fr_1fr]">
         <QuoteForm initialType={initialType} product={product ? { slug: product.slug, name: product.name } : undefined} />
         <aside className="space-y-6">
-          <div className="rounded-lg border border-line bg-white p-6">
+          <div className="border border-line bg-white p-6">
             <h2 className="font-semibold text-ink">What happens next</h2>
             <div className="mt-4">
               <CheckList
@@ -39,7 +39,7 @@ export default async function QuotePage({ searchParams }: PageProps<"/quote">) {
               />
             </div>
           </div>
-          <div className="rounded-lg border border-line bg-white p-6">
+          <div className="border border-line bg-white p-6">
             <h2 className="font-semibold text-ink">Prefer to talk?</h2>
             <p className="mt-2 text-sm text-graphite">Call us or send a photo on WhatsApp.</p>
             <div className="mt-4 flex flex-col gap-2 text-sm font-semibold">

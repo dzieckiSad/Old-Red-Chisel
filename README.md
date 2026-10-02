@@ -20,7 +20,8 @@ npm run lint
 | `src/app/` | Pages (Next.js App Router): home, shop, product, bespoke, build & renovate, projects, quote, cart, contact, delivery, legal |
 | `src/components/` | Header, footer, logo, product buy box, quote form, shared sections |
 | `src/lib/site.ts` | Company details (phone, email, service area, survey fee) |
-| `src/lib/catalog.ts` | Shop products and categories (sample data for now) |
+| `src/lib/catalog.ts` | Product types, categories, sample products (seed) |
+| `src/lib/products.ts` | Products in the database |
 | `src/lib/services.ts` | Bespoke and building services |
 | `src/lib/delivery.ts` | Delivery zones and prices |
 | `public/brand/` | Logo files |
@@ -38,5 +39,5 @@ Setup of the services and environment variables: [`docs/SETUP.md`](docs/SETUP.md
 
 - **Payments, email, database**: code complete; need Stripe, Resend and Neon connected in Vercel (see setup). Until then the site shows "online payment opens soon"; a simulated payment button exists only in local development.
 - **Quote requests**: validated and logged on the server only; saving and emailing them is next.
-- **Products**: still in `src/lib/catalog.ts`; editing them from the admin panel is next.
+- **Products**: managed in the admin panel (photos in Vercel Blob, stock, promotions, order, hide/feature); seeded from the samples in `src/lib/catalog.ts`. Option surcharges are still set in code.
 - **Content**: products, prices and contact details are placeholders (marked `TODO`); photos are wood-texture placeholders.

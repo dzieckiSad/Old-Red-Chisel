@@ -11,8 +11,11 @@ import type { IconName } from "@/components/sketch/icons";
 import { Frame, PencilNote, RulerDivider, SketchUnderline } from "@/components/sketch/ornaments";
 import { Reveal } from "@/components/sketch/reveal";
 import { ButtonLink, Container, PhotoPlaceholder, SectionHeading } from "@/components/ui";
-import { getFeaturedProducts } from "@/lib/catalog";
+import { getFeaturedProducts } from "@/lib/products";
 import { site } from "@/lib/site";
+
+// Product data can change from the admin panel; saves also refresh pages immediately.
+export const revalidate = 60;
 
 const doors: { href: string; icon: IconName; title: string; text: string; cta: string }[] = [
   {
@@ -61,8 +64,8 @@ const faqs = [
   },
 ];
 
-export default function HomePage() {
-  const featured = getFeaturedProducts();
+export default async function HomePage() {
+  const featured = await getFeaturedProducts();
 
   return (
     <>

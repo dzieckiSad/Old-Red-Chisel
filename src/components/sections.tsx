@@ -3,18 +3,31 @@ import { type IconName, SketchIcon } from "@/components/sketch/icons";
 import { CornerMarks, PencilNote } from "@/components/sketch/ornaments";
 import { Reveal } from "@/components/sketch/reveal";
 import { ButtonLink, Container, PhotoPlaceholder } from "@/components/ui";
-import { type Product, modeLabels } from "@/lib/catalog";
+import { ProductPhoto } from "@/components/product-photo";
+import { type Product, currentPrice, isSoldOut, modeLabels, onSale } from "@/lib/catalog";
 import { formatPrice } from "@/lib/format";
 import { site } from "@/lib/site";
 
 export function ProductCard({ product }: { product: Product }) {
+  const sale = onSale(product);
+  const soldOut = isSoldOut(product);
+  const badge = soldOut ? "Sold out" : sale ? "Sale" : product.mode === "in_stock" ? "In stock" : null;
   return (
     <Link href={`/shop/${product.slug}`} className="card group block p-2.5">
       <div className="relative overflow-hidden">
-        <PhotoPlaceholder className="aspect-[4/5] transition-transform duration-700 ease-out group-hover:scale-[1.03]" />
-        {product.mode === "in_stock" && (
-          <span className="absolute top-2.5 left-2.5 bg-white px-2 py-0.5 text-[11px] font-semibold tracking-wide text-ink uppercase">
-            In stock
+        <ProductPhoto
+          image={product.images?.[0]}
+          alt={product.name}
+          sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
+          className={`aspect-[4/5] transition-transform duration-700 ease-out group-hover:scale-[1.03] ${soldOut ? "opacity-60" : ""}`}
+        />
+        {badge && (
+          <span
+            className={`absolute top-2.5 left-2.5 px-2 py-0.5 text-[11px] font-semibold tracking-wide uppercase ${
+              sale && !soldOut ? "bg-brand text-white" : "bg-white text-ink"
+            }`}
+          >
+            {badge}
           </span>
         )}
       </div>
@@ -23,8 +36,17 @@ export function ProductCard({ product }: { product: Product }) {
           <h3 className="font-medium text-ink group-hover:text-brand">{product.name}</h3>
           <p className="mt-0.5 text-xs text-graphite">{modeLabels[product.mode]}</p>
         </div>
-        <p className="shrink-0 font-semibold text-ink">
-          {product.mode === "quote_only" ? `from ${formatPrice(product.price)}` : formatPrice(product.price)}
+        <p className="shrink-0 text-right font-semibold text-ink">
+          {product.mode === "quote_only" ? (
+            `from ${formatPrice(product.price)}`
+          ) : sale ? (
+            <>
+              <span className="text-brand">{formatPrice(currentPrice(product))}</span>
+              <s className="block text-xs font-normal text-graphite">{formatPrice(product.price)}</s>
+            </>
+          ) : (
+            formatPrice(product.price)
+          )}
         </p>
       </div>
       <CornerMarks />

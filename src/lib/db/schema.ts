@@ -1,4 +1,5 @@
-import { integer, jsonb, pgTable, text, timestamp, uuid, date } from "drizzle-orm/pg-core";
+import { boolean, date, integer, jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import type { ProductImage, ProductMode, ProductOption } from "@/lib/catalog";
 
 export const orderStatuses = [
   "pending_payment",
@@ -63,6 +64,30 @@ export const orderEvents = pgTable("order_events", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const products = pgTable("products", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  slug: text("slug").notNull().unique(),
+  name: text("name").notNull(),
+  category: text("category").notNull(),
+  mode: text("mode").$type<ProductMode>().notNull(),
+  price: integer("price").notNull(), // cents
+  salePrice: integer("sale_price"), // cents
+  saleEndsAt: date("sale_ends_at"),
+  summary: text("summary").notNull().default(""),
+  description: text("description").notNull().default(""),
+  dimensions: text("dimensions").notNull().default(""),
+  material: text("material").notNull().default(""),
+  leadTime: text("lead_time").notNull().default(""),
+  stock: integer("stock"),
+  options: jsonb("options").$type<ProductOption[]>().notNull().default([]),
+  images: jsonb("images").$type<ProductImage[]>().notNull().default([]),
+  featured: boolean("featured").notNull().default(false),
+  hidden: boolean("hidden").notNull().default(false),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const adminUsers = pgTable("admin_users", {
   id: uuid("id").primaryKey().defaultRandom(),
   email: text("email").notNull().unique(),
@@ -117,6 +142,30 @@ create table if not exists order_events (
   created_at timestamptz not null default now()
 );
 create index if not exists order_events_order_idx on order_events (order_id, created_at);
+create table if not exists products (
+  id uuid primary key default gen_random_uuid(),
+  slug text not null unique,
+  name text not null,
+  category text not null,
+  mode text not null,
+  price integer not null,
+  sale_price integer,
+  sale_ends_at date,
+  summary text not null default '',
+  description text not null default '',
+  dimensions text not null default '',
+  material text not null default '',
+  lead_time text not null default '',
+  stock integer,
+  options jsonb not null default '[]',
+  images jsonb not null default '[]',
+  featured boolean not null default false,
+  hidden boolean not null default false,
+  sort_order integer not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+create index if not exists products_listing_idx on products (hidden, sort_order);
 create table if not exists admin_users (
   id uuid primary key default gen_random_uuid(),
   email text not null unique,

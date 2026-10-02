@@ -21,6 +21,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <span className="font-hand text-2xl text-white/80">workshop admin</span>
           </Link>
           {admin && (
+            <nav className="flex items-center gap-1 text-sm font-semibold">
+              <Link href={base} className="px-3 py-1.5 hover:bg-white/10">Orders</Link>
+              <Link href={`${base}/products`} className="px-3 py-1.5 hover:bg-white/10">Products</Link>
+            </nav>
+          )}
+          {admin && (
             <form action={logoutAdmin} className="flex items-center gap-4 text-sm">
               <span className="hidden text-white/70 sm:inline">{admin.email}</span>
               <button type="submit" className="font-semibold hover:text-brand">Sign out</button>

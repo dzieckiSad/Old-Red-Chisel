@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ProductCard } from "@/components/sections";
 import { Container, PageHeader } from "@/components/ui";
-import { categories, getCategory, getProducts } from "@/lib/catalog";
+import { categories, getCategory } from "@/lib/catalog";
+import { getProducts } from "@/lib/products";
 
 export const metadata: Metadata = {
   title: "Shop handmade furniture & joinery",
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
 export default async function ShopPage({ searchParams }: PageProps<"/shop">) {
   const { category } = await searchParams;
   const active = typeof category === "string" ? getCategory(category) : undefined;
-  const products = getProducts({ category: active?.slug });
+  const products = await getProducts({ category: active?.slug });
 
   return (
     <>

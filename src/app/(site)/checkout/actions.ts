@@ -6,7 +6,7 @@ import { CheckoutError, createPendingOrder, getOrder, markPaid, priceCart, setPa
 import { paymentMode, stripe } from "@/lib/payments";
 import { isValidEircode } from "@/lib/quote";
 import { allowAttempt, clientIp } from "@/lib/rate-limit";
-import { site } from "@/lib/site";
+import { getContact } from "@/lib/content";
 
 export type CheckoutInput = {
   cart: { slug: string; options: Record<string, string>; quantity: number }[];
@@ -29,9 +29,10 @@ export type CheckoutResult =
 const methods: DeliveryMethod[] = ["collection", "delivery", "delivery_assembly"];
 
 export async function startCheckout(input: CheckoutInput): Promise<CheckoutResult> {
+  const { phone } = await getContact();
   const mode = paymentMode();
   if (mode === "off" || !isDatabaseConfigured()) {
-    return { ok: false, message: `Online payment isn't available yet. Please call us on ${site.phone} to order.` };
+    return { ok: false, message: `Online payment isn't available yet. Please call us on ${phone} to order.` };
   }
 
   const v = {
@@ -59,7 +60,7 @@ export async function startCheckout(input: CheckoutInput): Promise<CheckoutResul
 
   try {
     if (!(await allowAttempt(`checkout:${await clientIp()}`, 15, 60 * 60))) {
-      return { ok: false, message: `Too many checkout attempts. Please try again later or call us on ${site.phone}.` };
+      return { ok: false, message: `Too many checkout attempts. Please try again later or call us on ${phone}.` };
     }
     const items = await priceCart(Array.isArray(input.cart) ? input.cart : []);
     const order = await createPendingOrder({
@@ -90,7 +91,7 @@ export async function startCheckout(input: CheckoutInput): Promise<CheckoutResul
   } catch (err) {
     if (err instanceof CheckoutError) return { ok: false, message: err.message };
     console.error("Checkout failed", err);
-    return { ok: false, message: `Something went wrong starting the payment. Please try again or call us on ${site.phone}.` };
+    return { ok: false, message: `Something went wrong starting the payment. Please try again or call us on ${phone}.` };
   }
 }
 

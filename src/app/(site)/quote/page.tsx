@@ -3,11 +3,11 @@ import { QuoteForm } from "@/components/quote-form";
 import { CheckList, Container, PageHeader } from "@/components/ui";
 import { getProduct } from "@/lib/products";
 import { initialProjectType } from "@/lib/quote";
-import { site } from "@/lib/site";
+import { getContact, getContent } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Get a free quote",
-  description: `Send us a few details and photos and we'll come back with a price range within ${site.quoteResponseHours} hours.`,
+  description: "Send us a few details and photos and we'll come back with a price range within 48 hours.",
 };
 
 export default async function QuotePage({ searchParams }: PageProps<"/quote">) {
@@ -16,6 +16,8 @@ export default async function QuotePage({ searchParams }: PageProps<"/quote">) {
   const product = await getProduct(first(params.product) ?? "");
   const initialType = product ? "custom-product" : initialProjectType({ type: first(params.type), service: first(params.service) });
 
+  const [content, contact] = await Promise.all([getContent(), getContact()]);
+  const site = { ...contact, quoteResponseHours: content.quoteResponseHours, surveyFee: content.surveyFee };
   return (
     <>
       <PageHeader
@@ -24,7 +26,7 @@ export default async function QuotePage({ searchParams }: PageProps<"/quote">) {
         intro={`It takes about two minutes. We'll reply within ${site.quoteResponseHours} hours with a price range and next steps.`}
       />
       <Container className="grid gap-10 py-12 lg:grid-cols-[2fr_1fr]">
-        <QuoteForm initialType={initialType} product={product ? { slug: product.slug, name: product.name } : undefined} />
+        <QuoteForm initialType={initialType} product={product ? { slug: product.slug, name: product.name } : undefined} site={site} />
         <aside className="space-y-6">
           <div className="border border-line bg-white p-6">
             <h2 className="font-semibold text-ink">What happens next</h2>

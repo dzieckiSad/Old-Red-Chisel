@@ -17,15 +17,18 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="min-h-full bg-sand/50">
       <header className="border-b border-line bg-ink text-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3 sm:px-6">
           <Link href={base} className="flex items-center gap-3">
             <Logo variant="dark" height={36} />
-            <span className="font-hand text-2xl text-white/80">workshop admin</span>
+            <span className="font-hand hidden text-2xl text-white/80 sm:inline">workshop admin</span>
           </Link>
           {admin && (
-            <nav className="flex items-center gap-1 text-sm font-semibold">
-              <Link href={base} className="px-3 py-1.5 hover:bg-white/10">Orders</Link>
+            <nav className="order-last -mx-3 flex w-full flex-wrap items-center gap-1 text-sm font-semibold md:order-none md:mx-0 md:w-auto">
+              <Link href={base} className="px-3 py-1.5 hover:bg-white/10">Dashboard</Link>
+              <Link href={`${base}/orders`} className="px-3 py-1.5 hover:bg-white/10">Orders</Link>
               <Link href={`${base}/products`} className="px-3 py-1.5 hover:bg-white/10">Products</Link>
+              <Link href={`${base}/projects`} className="px-3 py-1.5 hover:bg-white/10">Projects</Link>
+              <Link href={`${base}/content`} className="px-3 py-1.5 hover:bg-white/10">Content</Link>
             </nav>
           )}
           {admin && (

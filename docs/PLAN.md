@@ -281,10 +281,9 @@ Proponowany stos:
 - [ ] Prosty konfigurator szafy (szerokość/wysokość/drzwi/wnętrze → orientacyjna cena)
 - [ ] Strony lokalne (hrabstwa), poradnik/blog
 - [ ] Raty, program poleceń, newsletter
-- [ ] Chatbot na stronie (po bazie danych i panelu admina). Ustalone: mały model open source;
-      gdy bot nie zna odpowiedzi albo klient chce człowieka, zbiera kontakt i pytanie,
-      rozmowa trafia do panelu admina + e-mail. Do ustalenia: zakres, gdzie działa model
-      (Vercel nie ma kart graficznych: w przeglądarce klienta, tani serwer albo API z modelem open source).
+- [ ] Chatbot na stronie, na samym końcu budowy. Model: DeepSeek (wersja „flash”), konfigurujemy razem.
+      Gdy bot nie zna odpowiedzi albo klient chce człowieka: kontakt i pytanie trafiają do panelu admina + e-mail.
+      Zakres do ustalenia.
 
 ### Faza 3 — Pełna platforma
 - [ ] Konto klienta ze statusem projektu (pomiar → projekt → produkcja → montaż) i dokumentami

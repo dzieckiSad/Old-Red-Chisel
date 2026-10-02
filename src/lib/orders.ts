@@ -5,7 +5,7 @@ import { currentPrice } from "@/lib/catalog";
 import { getProduct, takeFromStock } from "@/lib/products";
 import { getDb } from "@/lib/db";
 import { type DeliveryMethod, type OrderItem, type OrderStatus, orderEvents, orders } from "@/lib/db/schema";
-import { deliveryZones } from "@/lib/delivery";
+import { getDeliveryZones } from "@/lib/content";
 import { sendOrderCredentialsEmail } from "@/lib/email";
 import type { ManualPayment } from "@/lib/order-status";
 import { hashPassword, newOrderCode, newOrderPassword, seal, unseal } from "@/lib/security";
@@ -39,9 +39,9 @@ export async function priceCart(lines: { slug: string; options: Record<string, s
   }));
 }
 
-export function deliveryFee(method: DeliveryMethod, zoneName: string | null) {
+export async function deliveryFee(method: DeliveryMethod, zoneName: string | null) {
   if (method === "collection") return 0;
-  const zone = deliveryZones.find((z) => z.name === zoneName);
+  const zone = (await getDeliveryZones()).find((z) => z.name === zoneName);
   if (!zone || zone.delivery === null) throw new CheckoutError("Choose a delivery zone we cover, or workshop collection.");
   const assembly = method === "delivery_assembly" ? zone.assembly : 0;
   if (assembly === null) throw new CheckoutError("Assembly isn't available for that zone.");
@@ -64,7 +64,7 @@ export type NewOrder = {
 export async function createPendingOrder(input: NewOrder) {
   const db = await getDb();
   const subtotal = input.items.reduce((s, i) => s + i.unitPrice * i.quantity, 0);
-  const fee = deliveryFee(input.deliveryMethod, input.deliveryZone);
+  const fee = await deliveryFee(input.deliveryMethod, input.deliveryZone);
   const password = newOrderPassword();
   const passwordHash = await hashPassword(password);
 

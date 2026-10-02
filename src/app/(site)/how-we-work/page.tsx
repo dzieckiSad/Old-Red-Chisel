@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import { CtaBand, FaqList, ProcessSteps } from "@/components/sections";
 import { Container, PageHeader, SectionHeading } from "@/components/ui";
-import { site } from "@/lib/site";
+import { getContent } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "How we work",
   description: "From your first photo to the final fitting: how a bespoke or renovation project with Old Red Chisel works.",
 };
 
-export default function HowWeWorkPage() {
+export default async function HowWeWorkPage() {
+  const site = await getContent();
   return (
     <>
       <PageHeader

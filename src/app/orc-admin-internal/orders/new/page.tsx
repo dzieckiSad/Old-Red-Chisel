@@ -14,7 +14,7 @@ export default async function NewOrderPage() {
 
   return (
     <>
-      <Link href={base} className="text-sm font-semibold text-graphite hover:text-ink">← All orders</Link>
+      <Link href={`${base}/orders`} className="text-sm font-semibold text-graphite hover:text-ink">← All orders</Link>
       <h1 className="mt-3 font-serif text-3xl font-semibold">New order</h1>
       <p className="mt-1 mb-6 text-sm text-graphite">
         For customers who order by phone or in person and pay in cash, by transfer or later. They get an order number and

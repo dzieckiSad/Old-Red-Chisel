@@ -8,6 +8,7 @@ import { CtaBand } from "@/components/sections";
 import { type IconName, SketchIcon } from "@/components/sketch/icons";
 import { CornerMarks, Frame, PencilNote, RulerDivider, SketchCircle, SketchUnderline } from "@/components/sketch/ornaments";
 import { Reveal } from "@/components/sketch/reveal";
+import { getContact } from "@/lib/content";
 import { ButtonArrow, Container, Eyebrow, SectionHeading } from "@/components/ui";
 
 export const metadata: Metadata = {
@@ -15,7 +16,6 @@ export const metadata: Metadata = {
   description: "Meet Old Red Chisel — a small, master-led carpentry team in Athlone with 20 years of experience building bespoke furniture.",
 };
 
-const directions = "https://maps.app.goo.gl/boCn4FWCBCWbT2wEA?g_st=ic";
 
 /** Chamfered corners, same cut as the buttons. */
 const chamfer = "[clip-path:polygon(12px_0,100%_0,100%_calc(100%-12px),calc(100%-12px)_100%,0_100%,0_12px)]";
@@ -43,12 +43,14 @@ const gallery: { photo: StaticImageData; alt: string; title: string; text: strin
   },
 ];
 
-const visit: { icon: IconName; title: string; text: string }[] = [
-  { icon: "pin", title: "Workshop & showroom", text: "Golden Island, Athlone, Co. Westmeath" },
-  { icon: "clock", title: "Workshop hours", text: "Mon – Fri, 9:00 – 17:30" },
-];
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const contact = await getContact();
+  const directions = contact.mapsHref;
+  const visit: { icon: IconName; title: string; text: string }[] = [
+    { icon: "pin", title: "Workshop & showroom", text: contact.address },
+    { icon: "clock", title: "Workshop hours", text: contact.hours },
+  ];
   return (
     <>
       {/* Who we are */}

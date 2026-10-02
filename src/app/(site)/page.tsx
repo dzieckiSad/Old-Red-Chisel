@@ -6,12 +6,14 @@ import {
   ProductCard,
   TrustBar,
 } from "@/components/sections";
-import { BeforeAfter } from "@/components/sketch/before-after";
+import { ProjectVisual } from "@/components/project-visual";
 import type { IconName } from "@/components/sketch/icons";
 import { Frame, PencilNote, RulerDivider, SketchUnderline } from "@/components/sketch/ornaments";
 import { Reveal } from "@/components/sketch/reveal";
 import { ButtonLink, Container, PhotoPlaceholder, SectionHeading } from "@/components/ui";
 import { getFeaturedProducts } from "@/lib/products";
+import { getFeaturedProject } from "@/lib/projects";
+import { getContent } from "@/lib/content";
 import { site } from "@/lib/site";
 
 // Product data can change from the admin panel; saves also refresh pages immediately.
@@ -41,45 +43,43 @@ const doors: { href: string; icon: IconName; title: string; text: string; cta: s
   },
 ];
 
-const faqs = [
-  {
-    q: "Which areas do you cover?",
-    a: `We're based in ${site.address.locality} and work across ${site.serviceArea.join(", ")}. For bigger projects further away, just ask.`,
-  },
-  {
-    q: "How much does a fitted wardrobe or kitchen cost?",
-    a: "Fitted wardrobes start from around €1,800 and bespoke kitchens from around €8,500. Send us a photo and rough sizes for a price range within 48 hours.",
-  },
-  {
-    q: "Do you charge for a survey?",
-    a: `A home survey costs €${site.surveyFee}, and we take it off your order if you go ahead.`,
-  },
-  {
-    q: "Can I order a shop piece in a different size?",
-    a: "Yes. Every piece is made in our own workshop, so we can change sizes, timber and finish. Use “Need a different size?” on any product page.",
-  },
-  {
-    q: "Do you deliver and assemble?",
-    a: "We deliver with our own van. Assembly and fitting can be added at checkout, or you can collect from the workshop for free.",
-  },
-];
 
 export default async function HomePage() {
-  const featured = await getFeaturedProducts();
+  const [featured, project, content] = await Promise.all([getFeaturedProducts(), getFeaturedProject(), getContent()]);
+  const { contact, home } = content;
+  const faqs = [
+    {
+      q: "Which areas do you cover?",
+      a: `We're based in ${contact.locality} and work across ${site.serviceArea.join(", ")}. For bigger projects further away, just ask.`,
+    },
+    {
+      q: "How much does a fitted wardrobe or kitchen cost?",
+      a: `Fitted wardrobes start from around €1,800 and bespoke kitchens from around €8,500. Send us a photo and rough sizes for a price range within ${content.quoteResponseHours} hours.`,
+    },
+    {
+      q: "Do you charge for a survey?",
+      a: `A home survey costs €${content.surveyFee}, and we take it off your order if you go ahead.`,
+    },
+    {
+      q: "Can I order a shop piece in a different size?",
+      a: "Yes. Every piece is made in our own workshop, so we can change sizes, timber and finish. Use “Need a different size?” on any product page.",
+    },
+    {
+      q: "Do you deliver and assemble?",
+      a: "We deliver with our own van. Assembly and fitting can be added at checkout, or you can collect from the workshop for free.",
+    },
+  ];
 
   return (
     <>
       <section className="relative overflow-hidden bg-sand/60">
         <Container className="grid items-center gap-12 py-14 md:grid-cols-[1.1fr_1fr] md:py-20">
           <Reveal>
-            <p className="text-sm font-semibold text-brand">Handmade in Athlone · Serving the Midlands</p>
+            <p className="text-sm font-semibold text-brand">{home.eyebrow}</p>
             <h1 className="mt-3 font-serif text-4xl leading-tight font-semibold text-ink sm:text-5xl lg:text-6xl">
-              Joinery made <SketchUnderline>by hand.</SketchUnderline> Homes improved by the same hands.
+              {home.headline.split("*").map((part, i) => (i % 2 ? <SketchUnderline key={i}>{part}</SketchUnderline> : part))}
             </h1>
-            <p className="mt-6 max-w-lg text-lg text-graphite">
-              From a single bedside locker to a bespoke kitchen or a full renovation, built in our
-              own workshop and fitted by our own team.
-            </p>
+            <p className="mt-6 max-w-lg text-lg text-graphite">{home.intro}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <ButtonLink href="/quote" arrow>
                 Get a free quote
@@ -155,14 +155,15 @@ export default async function HomePage() {
             </div>
           </Reveal>
           <Reveal delay={120}>
-            <Frame caption="alcove units, Athlone">
-              <BeforeAfter
-                className="aspect-[4/3]"
-                label="Alcove units: before and after"
-                before={<div className="plaster-placeholder h-full w-full" />}
-                after={<PhotoPlaceholder className="h-full w-full" />}
-              />
-            </Frame>
+            {project ? (
+              <Frame caption={[project.title.toLowerCase(), project.place].filter(Boolean).join(", ")}>
+                <ProjectVisual project={project} sizes="(min-width: 768px) 55vw, 100vw" />
+              </Frame>
+            ) : (
+              <Frame>
+                <PhotoPlaceholder className="aspect-[4/3]" />
+              </Frame>
+            )}
           </Reveal>
         </Container>
       </section>

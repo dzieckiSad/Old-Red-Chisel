@@ -86,6 +86,20 @@ Przed startem zmienimy `TEMP_ADMIN_2FA_OFF` na `false` (`src/lib/admin-config.ts
   na telefonie w menu „…”) → na samym dole **Danger Zone** → **Change visibility** → **Make private** → potwierdź nazwą repozytorium.
   Vercel dalej działa; jeśli poprosi o dostęp, zatwierdź go w GitHub → Settings → Applications → Vercel.
 
+## Pulpit (Dashboard)
+Po zalogowaniu panel otwiera **pulpit**: wartość zamówień w tym miesiącu (i zmiana do poprzedniego), ile zamówień czeka
+na start, ile jest w warsztacie i ile gotowych / w drodze, wykres wartości zamówień z 6 miesięcy (najedź na słupek),
+lista „Needs attention” (wyprzedane produkty, nieopłacone ręczne zamówienia, realizacje z przykładowymi zdjęciami)
+i ostatnie zamówienia. Lista wszystkich zamówień jest w **Orders**.
+
+## Treść strony (Content)
+Panel → **Content**: zmieniasz bez programisty:
+- dane kontaktowe (telefon, WhatsApp, e-mail, adres, godziny, link do Google Maps): nagłówek, stopka, Contact, About, maile,
+- nagłówek strony głównej (słowa w \*gwiazdkach\* dostają ołówkowe podkreślenie) i tekst pod nim,
+- strefy dostawy z cenami dostawy i montażu (strona Delivery i kasa),
+- ceny „from” przy usługach, opłatę za pomiar i czas odpowiedzi na wycenę.
+Zmiany widać na stronie od razu po zapisaniu.
+
 ## Produkty w panelu
 Panel → **Products**:
 - **+ New product**: nazwa, adres strony (tworzy się sam), kategoria, sposób sprzedaży
@@ -96,6 +110,15 @@ Panel → **Products**:
 - usuwanie na dole strony produktu (kasuje też zdjęcia).
 Przykładowe produkty zostały wczytane jako widoczne. Zmień je albo ukryj.
 Opcje z dopłatami (drewno, wykończenie) są na razie ustawione w kodzie.
+
+## Realizacje (Projects)
+Panel → **Projects**: prace pokazywane na stronie **Projects** z suwakiem przed/po.
+- **+ New project**: tytuł, miejscowość, rodzaj pracy, krótki opis, historia, materiały, czas realizacji,
+- **Before & after**: zdjęcie przed i po. Róbcie oba z tego samego miejsca, żeby suwak się pokrywał,
+- **More photos**: dodatkowe zdjęcia pod opisem,
+- **★** pokazuje realizację na stronie głównej w „See the difference”, **↑ ↓** kolejność, **Hide / Show** ukrycie.
+Na start są 4 przykładowe realizacje z rysowanymi zdjęciami (oznaczone „Example” w panelu i „Example image”
+na stronie). Przed startem sklepu podmień zdjęcia na prawdziwe albo usuń te realizacje.
 
 ## Ręczne zamówienia (klient nie płaci przez stronę)
 Panel → **Orders → + New order**: dla zamówień przez telefon albo na miejscu.

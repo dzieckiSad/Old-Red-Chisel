@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Container, PageHeader } from "@/components/ui";
-import { deliveryZones } from "@/lib/delivery";
+import { getDeliveryZones } from "@/lib/content";
 import { formatPrice } from "@/lib/format";
 
 export const metadata: Metadata = {
@@ -13,7 +13,8 @@ function price(value: number | null) {
   return value === 0 ? "Free" : formatPrice(value);
 }
 
-export default function DeliveryPage() {
+export default async function DeliveryPage() {
+  const deliveryZones = await getDeliveryZones();
   return (
     <>
       <PageHeader

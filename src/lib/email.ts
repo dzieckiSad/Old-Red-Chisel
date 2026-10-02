@@ -1,6 +1,7 @@
 import "server-only";
 import type { orders } from "@/lib/db/schema";
 import { formatCents, paymentSummary } from "@/lib/order-status";
+import { getContact } from "@/lib/content";
 import { site } from "@/lib/site";
 
 type Order = typeof orders.$inferSelect;
@@ -18,7 +19,7 @@ async function send(to: string, subject: string, html: string, text: string) {
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ from, to, subject, html, text, reply_to: site.email }),
+    body: JSON.stringify({ from, to, subject, html, text, reply_to: (await getContact()).email }),
   });
   if (!res.ok) throw new Error(`Resend ${res.status}: ${await res.text()}`);
   return true;
@@ -27,6 +28,7 @@ async function send(to: string, subject: string, html: string, text: string) {
 const escape = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 
 export async function sendOrderCredentialsEmail(order: Order, password: string) {
+  const { phone } = await getContact();
   const trackUrl = `${site.url}/track`;
   const lines = order.items.map((i) => `${i.quantity} × ${i.name} — ${formatCents(i.unitPrice * i.quantity)}`);
   const payment = paymentSummary(order.paymentRef);
@@ -42,7 +44,7 @@ export async function sendOrderCredentialsEmail(order: Order, password: string) 
     ...lines,
     totalLine,
     "",
-    `Questions? Reply to this email or call ${site.phone}.`,
+    `Questions? Reply to this email or call ${phone}.`,
     site.name,
   ].join("\n");
 
@@ -55,7 +57,7 @@ export async function sendOrderCredentialsEmail(order: Order, password: string) 
       <tr><td style="padding:4px 12px 4px 0">Password</td><td style="font-family:monospace;font-size:18px"><b>${escape(password)}</b></td></tr>
     </table>
     <p>${lines.map(escape).join("<br>")}<br><b>${escape(totalLine)}</b></p>
-    <p>Questions? Reply to this email or call ${site.phone}.</p>
+    <p>Questions? Reply to this email or call ${phone}.</p>
     <p>${site.name}</p>
   </div>`;
 

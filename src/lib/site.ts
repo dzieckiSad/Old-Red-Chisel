@@ -1,19 +1,11 @@
 // Company details used across the site. Values marked TODO must be filled in before launch.
+// Contact details, prices and home page texts are edited in the admin panel: see content.ts.
 export const site = {
   name: "Old Red Chisel",
   tagline: "Home Improvements",
   description:
     "Handmade joinery, bespoke kitchens and fitted wardrobes, and complete home renovations from our workshop in Athlone.",
   url: "https://www.oldredchisel.ie", // TODO: confirm once the domain is bought
-  phone: "+353 00 000 0000", // TODO
-  phoneHref: "tel:+353000000000", // TODO
-  whatsappHref: "https://wa.me/353000000000", // TODO
-  email: "hello@oldredchisel.ie", // TODO
-  address: {
-    locality: "Athlone",
-    county: "Co. Westmeath",
-    country: "Ireland",
-  },
   serviceArea: ["Athlone", "Westmeath", "Roscommon", "Longford", "Offaly", "East Galway"],
   social: {
     facebook: "", // TODO: add Facebook page URL
@@ -22,8 +14,6 @@ export const site = {
     cro: "", // TODO: CRO number
     vat: "", // TODO: VAT number
   },
-  surveyFee: 75, // EUR, deducted from the order
-  quoteResponseHours: 48,
 } as const;
 
 export const nav = [

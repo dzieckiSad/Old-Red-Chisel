@@ -3,7 +3,7 @@ import { randomBytes } from "node:crypto";
 import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-// Product photos go to Vercel Blob when it's connected (BLOB_READ_WRITE_TOKEN). In local
+// Product and project photos go to Vercel Blob when it's connected (BLOB_READ_WRITE_TOKEN). In local
 // development they're kept in .data/uploads and served by /api/uploads/[name].
 
 const LOCAL_DIR = path.join(process.cwd(), ".data", "uploads");
@@ -16,7 +16,7 @@ export function uploadsAvailable() {
 
 export class UploadError extends Error {}
 
-export async function saveImage(file: File, prefix: string) {
+export async function saveImage(file: File, prefix: string, folder: "products" | "projects" = "products") {
   const ext = TYPES[file.type];
   if (!ext) throw new UploadError("Use JPG, PNG, WebP or AVIF photos.");
   if (file.size > MAX_IMAGE_BYTES) throw new UploadError("Each photo must be under 8 MB.");
@@ -24,7 +24,7 @@ export async function saveImage(file: File, prefix: string) {
 
   if (process.env.BLOB_READ_WRITE_TOKEN) {
     const { put } = await import("@vercel/blob");
-    const blob = await put(`products/${name}`, file, { access: "public", contentType: file.type, addRandomSuffix: true });
+    const blob = await put(`${folder}/${name}`, file, { access: "public", contentType: file.type, addRandomSuffix: true });
     return blob.url;
   }
   if (process.env.VERCEL) throw new UploadError("Photo storage isn't connected yet (Vercel → Storage → Blob).");

@@ -1,5 +1,6 @@
 import { boolean, date, integer, jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import type { ProductImage, ProductMode, ProductOption } from "@/lib/catalog";
+import type { ProjectImage } from "@/lib/project-types";
 
 export const orderStatuses = [
   "pending_payment",
@@ -88,6 +89,26 @@ export const products = pgTable("products", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const projects = pgTable("projects", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  slug: text("slug").notNull().unique(),
+  title: text("title").notNull(),
+  place: text("place").notNull().default(""),
+  type: text("type").notNull().default(""),
+  summary: text("summary").notNull().default(""),
+  description: text("description").notNull().default(""),
+  materials: text("materials").notNull().default(""),
+  duration: text("duration").notNull().default(""),
+  before: jsonb("before").$type<ProjectImage | null>(),
+  after: jsonb("after").$type<ProjectImage | null>(),
+  photos: jsonb("photos").$type<ProjectImage[]>().notNull().default([]),
+  featured: boolean("featured").notNull().default(false),
+  hidden: boolean("hidden").notNull().default(false),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 /** Panel-wide settings, e.g. the sealed authenticator secret once two-step sign-in is on. */
 export const adminSettings = pgTable("admin_settings", {
   key: text("key").primaryKey(),
@@ -164,6 +185,26 @@ create table if not exists products (
   updated_at timestamptz not null default now()
 );
 create index if not exists products_listing_idx on products (hidden, sort_order);
+create table if not exists projects (
+  id uuid primary key default gen_random_uuid(),
+  slug text not null unique,
+  title text not null,
+  place text not null default '',
+  type text not null default '',
+  summary text not null default '',
+  description text not null default '',
+  materials text not null default '',
+  duration text not null default '',
+  before jsonb,
+  after jsonb,
+  photos jsonb not null default '[]',
+  featured boolean not null default false,
+  hidden boolean not null default false,
+  sort_order integer not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+create index if not exists projects_listing_idx on projects (hidden, sort_order);
 create table if not exists admin_settings (
   key text primary key,
   value text not null

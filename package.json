@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "admin": "node scripts/admin.mjs"
+    "lint": "eslint"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.8",

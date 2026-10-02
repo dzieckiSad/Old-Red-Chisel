@@ -7,6 +7,7 @@ import { getDb } from "@/lib/db";
 import { type DeliveryMethod, type OrderItem, type OrderStatus, orderEvents, orders } from "@/lib/db/schema";
 import { deliveryZones } from "@/lib/delivery";
 import { sendOrderCredentialsEmail } from "@/lib/email";
+import type { ManualPayment } from "@/lib/order-status";
 import { hashPassword, newOrderCode, newOrderPassword, seal, unseal } from "@/lib/security";
 
 export type Order = typeof orders.$inferSelect;
@@ -194,4 +195,75 @@ export async function updateOrderStatus(orderId: string, update: { status: Order
   if (current.status !== update.status || (update.note && update.note !== current.statusNote)) {
     await db.insert(orderEvents).values({ orderId, status: update.status, note: update.note });
   }
+}
+
+export type ManualOrder = Omit<NewOrder, "deliveryZone"> & {
+  deliveryFee: number; // cents
+  status: OrderStatus;
+  etaDate: string | null;
+  statusNote: string | null;
+  payment: ManualPayment;
+  emailCustomer: boolean;
+};
+
+/**
+ * An order added in the admin panel for a customer who didn't pay on the website. The
+ * customer gets the same order number + password to follow it on /track.
+ */
+export async function createManualOrder(input: ManualOrder) {
+  const db = await getDb();
+  const subtotal = input.items.reduce((s, i) => s + i.unitPrice * i.quantity, 0);
+  const password = newOrderPassword();
+  const passwordHash = await hashPassword(password);
+  const { deliveryFee: fee, status, etaDate, statusNote, payment, emailCustomer, ...customer } = input;
+
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      const [order] = await db
+        .insert(orders)
+        .values({
+          ...customer,
+          deliveryZone: null,
+          code: newOrderCode(),
+          passwordHash,
+          status,
+          etaDate,
+          statusNote,
+          subtotal,
+          deliveryFee: fee,
+          total: subtotal + fee,
+          paymentRef: `manual:${payment}`,
+          paidAt: payment.startsWith("paid_") ? new Date() : null,
+          credentialsShownAt: new Date(),
+        })
+        .returning();
+      await db.insert(orderEvents).values({ orderId: order.id, status, note: statusNote ?? "Order added by the workshop" });
+      await takeFromStock(order.items.filter((i) => i.slug !== "custom"));
+      if (emailCustomer) {
+        try {
+          if (!(await sendOrderCredentialsEmail(order, password))) return { order, password, emailFailed: true };
+          await db.update(orders).set({ credentialsEmailedAt: new Date() }).where(eq(orders.id, order.id));
+        } catch (err) {
+          console.error("Manual order email failed", order.code, err);
+          return { order, password, emailFailed: true };
+        }
+      }
+      return { order, password, emailFailed: false };
+    } catch (err) {
+      if (!String(err).includes("unique") && !String(err).includes("duplicate")) throw err;
+    }
+  }
+  throw new Error("Could not allocate an order code.");
+}
+
+/** New password for an order (e.g. the customer lost theirs). Returned once, stored hashed. */
+export async function resetOrderPassword(orderId: string) {
+  const db = await getDb();
+  const password = newOrderPassword();
+  const [order] = await db
+    .update(orders)
+    .set({ passwordHash: await hashPassword(password), passwordSealed: null, updatedAt: new Date() })
+    .where(eq(orders.id, orderId))
+    .returning();
+  return order ? password : null;
 }

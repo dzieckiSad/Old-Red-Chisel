@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Logo } from "@/components/logo";
-import { adminBase, currentAdmin } from "@/lib/admin-auth";
+import { SketchIcon } from "@/components/sketch/icons";
+import { adminBase, adminConfigIssues, currentAdmin } from "@/lib/admin-auth";
 import { logoutAdmin } from "./actions";
 
 export const metadata: Metadata = {
@@ -11,7 +12,8 @@ export const metadata: Metadata = {
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const base = await adminBase();
-  const admin = await currentAdmin();
+  const issues = adminConfigIssues();
+  const admin = issues.length ? null : await currentAdmin();
   return (
     <div className="min-h-full bg-sand/50">
       <header className="border-b border-line bg-ink text-white">
@@ -34,7 +36,25 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           )}
         </div>
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">{children}</main>
+      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+        {issues.length ? (
+          <div className="mx-auto max-w-xl border border-line bg-white p-6 sm:p-8">
+            <SketchIcon name="clipboard" size={48} />
+            <h1 className="mt-2 font-serif text-2xl font-semibold">Almost there</h1>
+            <p className="mt-2 text-sm text-graphite">The panel needs these settings in Vercel. Add them, then Deployments → ⋯ → Redeploy.</p>
+            <ul className="mt-5 space-y-3">
+              {issues.map((i) => (
+                <li key={i.name} className="border-l-4 border-brand bg-cream p-3 text-sm">
+                  <b>{i.name}</b>
+                  <span className="block text-graphite">{i.how}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          children
+        )}
+      </main>
     </div>
   );
 }

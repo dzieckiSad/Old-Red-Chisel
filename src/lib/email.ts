@@ -1,18 +1,19 @@
 import "server-only";
 import type { orders } from "@/lib/db/schema";
-import { formatCents } from "@/lib/order-status";
+import { formatCents, paymentSummary } from "@/lib/order-status";
 import { site } from "@/lib/site";
 
 type Order = typeof orders.$inferSelect;
 
 // Sent through Resend (https://resend.com) when RESEND_API_KEY is set; otherwise logged,
 // so local development and previews work without an email account.
+/** Returns false when email isn't set up (nothing was sent); throws if sending failed. */
 async function send(to: string, subject: string, html: string, text: string) {
   const key = process.env.RESEND_API_KEY;
   const from = process.env.EMAIL_FROM ?? `${site.name} <orders@oldredchisel.ie>`;
   if (!key) {
     console.info(`[email not sent: RESEND_API_KEY missing] to=${to} subject="${subject}"\n${text}`);
-    return;
+    return false;
   }
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -20,6 +21,7 @@ async function send(to: string, subject: string, html: string, text: string) {
     body: JSON.stringify({ from, to, subject, html, text, reply_to: site.email }),
   });
   if (!res.ok) throw new Error(`Resend ${res.status}: ${await res.text()}`);
+  return true;
 }
 
 const escape = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
@@ -27,6 +29,8 @@ const escape = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)}
 export async function sendOrderCredentialsEmail(order: Order, password: string) {
   const trackUrl = `${site.url}/track`;
   const lines = order.items.map((i) => `${i.quantity} × ${i.name} — ${formatCents(i.unitPrice * i.quantity)}`);
+  const payment = paymentSummary(order.paymentRef);
+  const totalLine = payment.paid ? `Total paid: ${formatCents(order.total)}` : `Order total: ${formatCents(order.total)} (${payment.label.toLowerCase()})`;
   const text = [
     `Hi ${order.customerName},`,
     "",
@@ -36,7 +40,7 @@ export async function sendOrderCredentialsEmail(order: Order, password: string) 
     `Password: ${password}`,
     "",
     ...lines,
-    `Total paid: ${formatCents(order.total)}`,
+    totalLine,
     "",
     `Questions? Reply to this email or call ${site.phone}.`,
     site.name,
@@ -50,10 +54,10 @@ export async function sendOrderCredentialsEmail(order: Order, password: string) 
       <tr><td style="padding:4px 12px 4px 0">Order number</td><td style="font-family:monospace;font-size:18px"><b>${order.code}</b></td></tr>
       <tr><td style="padding:4px 12px 4px 0">Password</td><td style="font-family:monospace;font-size:18px"><b>${escape(password)}</b></td></tr>
     </table>
-    <p>${lines.map(escape).join("<br>")}<br><b>Total paid: ${formatCents(order.total)}</b></p>
+    <p>${lines.map(escape).join("<br>")}<br><b>${escape(totalLine)}</b></p>
     <p>Questions? Reply to this email or call ${site.phone}.</p>
     <p>${site.name}</p>
   </div>`;
 
-  await send(order.email, `Your order ${order.code}`, html, text);
+  return send(order.email, `Your order ${order.code}`, html, text);
 }

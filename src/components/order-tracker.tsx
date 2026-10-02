@@ -2,7 +2,7 @@ import { SketchIcon } from "@/components/sketch/icons";
 import { CornerMarks, PencilNote, SketchCircle } from "@/components/sketch/ornaments";
 import { Reveal } from "@/components/sketch/reveal";
 import type { Order, OrderEvent } from "@/lib/orders";
-import { currentStepIndex, deliveryLabels, formatCents, formatDate, statusLabels, trackingSteps } from "@/lib/order-status";
+import { currentStepIndex, deliveryLabels, formatCents, formatDate, paymentSummary, statusLabels, trackingSteps } from "@/lib/order-status";
 import { site } from "@/lib/site";
 
 export function OrderTracker({ order, events }: { order: Order; events: OrderEvent[] }) {
@@ -11,6 +11,7 @@ export function OrderTracker({ order, events }: { order: Order; events: OrderEve
   const cancelled = order.status === "cancelled";
   const eta = formatDate(order.etaDate);
   const done = order.status === "delivered" || order.status === "collected";
+  const payment = paymentSummary(order.paymentRef);
 
   return (
     <div className="grid items-start gap-8 lg:grid-cols-[1.6fr_1fr]">
@@ -104,9 +105,10 @@ export function OrderTracker({ order, events }: { order: Order; events: OrderEve
               <span>{order.deliveryFee === 0 ? "Free" : formatCents(order.deliveryFee)}</span>
             </li>
             <li className="flex justify-between pt-3 font-semibold">
-              <span>Total paid</span>
+              <span>{payment.paid ? "Total paid" : "Order total"}</span>
               <span>{formatCents(order.total)}</span>
             </li>
+            <li className={`pt-1 text-xs ${payment.paid ? "text-graphite" : "font-semibold text-brand"}`}>{payment.label}</li>
           </ul>
         </section>
         <section className="border border-line bg-white p-5 text-sm">

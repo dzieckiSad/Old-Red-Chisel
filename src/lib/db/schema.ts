@@ -92,7 +92,7 @@ export const adminUsers = pgTable("admin_users", {
   id: uuid("id").primaryKey().defaultRandom(),
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
-  totpSecret: text("totp_secret").notNull(),
+  totpSecret: text("totp_secret"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
@@ -170,9 +170,10 @@ create table if not exists admin_users (
   id uuid primary key default gen_random_uuid(),
   email text not null unique,
   password_hash text not null,
-  totp_secret text not null,
+  totp_secret text,
   created_at timestamptz not null default now()
 );
+alter table admin_users alter column totp_secret drop not null;
 create table if not exists login_attempts (
   key text primary key,
   count integer not null,

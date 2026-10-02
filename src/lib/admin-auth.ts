@@ -4,7 +4,7 @@ import { count, eq } from "drizzle-orm";
 import { cookies, headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { TEMP_SIMPLE_ADMIN_PATH, secretAdminPath } from "@/lib/admin-config";
-import { getDb } from "@/lib/db";
+import { getDb, isDatabaseConfigured } from "@/lib/db";
 import { adminUsers } from "@/lib/db/schema";
 import { allowAttempt } from "@/lib/rate-limit";
 import { signToken, verifyToken } from "@/lib/security";
@@ -76,6 +76,18 @@ export async function grantGatePass(base: string) {
   (await cookies()).set(GATE_COOKIE, signToken({ kind: "admin-gate" }, GATE_TTL), cookieOptions(base, GATE_TTL));
 }
 
+/** Settings the panel needs before it can work, in the words shown on the setup checklist. */
+export function adminConfigIssues() {
+  const issues: { name: string; how: string }[] = [];
+  if (!isDatabaseConfigured()) {
+    issues.push({ name: "Database", how: "Vercel → Storage → Create Database → Neon → connect it to this project." });
+  }
+  if (process.env.VERCEL && (process.env.SESSION_SECRET ?? "").length < 32) {
+    issues.push({ name: "SESSION_SECRET", how: "Settings → Environment Variables: any random text of 40+ characters." });
+  }
+  return issues;
+}
+
 export async function adminCount() {
   const db = await getDb();
   const [row] = await db.select({ n: count() }).from(adminUsers);
@@ -84,6 +96,7 @@ export async function adminCount() {
 
 export async function currentAdmin() {
   await adminBase();
+  if (adminConfigIssues().length) return null;
   const payload = verifyToken<{ adminId: string }>((await cookies()).get(SESSION_COOKIE)?.value);
   if (!payload) return null;
   const db = await getDb();

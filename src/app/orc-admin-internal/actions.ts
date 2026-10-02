@@ -3,14 +3,28 @@
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import QRCode from "qrcode";
 import { adminBase, adminCount, endAdminSession, requireAdmin, startAdminSession } from "@/lib/admin-auth";
+import { TEMP_ADMIN_2FA_OFF } from "@/lib/admin-config";
 import { getDb } from "@/lib/db";
 import { adminUsers, type OrderStatus, orderStatuses } from "@/lib/db/schema";
 import { updateOrderStatus } from "@/lib/orders";
 import { allowAttempt, clearAttempts, clientIp } from "@/lib/rate-limit";
-import { hashPassword, safeEqual, seal, unseal, verifyPassword, verifyTotp } from "@/lib/security";
+import { hashPassword, newTotpSecret, safeEqual, seal, totpUri, unseal, verifyPassword, verifyTotp } from "@/lib/security";
 
-export type FormState = { error?: string; email?: string; saved?: boolean };
+export type FormState = {
+  error?: string;
+  email?: string;
+  saved?: boolean;
+  /** Set when 2FA is required but this admin hasn't added the authenticator app yet. */
+  enroll?: { sealed: string; secret: string; qrSvg: string };
+};
+
+async function enrolment(email: string) {
+  const secret = newTotpSecret();
+  const qrSvg = await QRCode.toString(totpUri(secret, email), { type: "svg", margin: 0, color: { dark: "#24201d", light: "#ffffff" } });
+  return { sealed: seal(secret), secret, qrSvg };
+}
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
 
@@ -29,18 +43,22 @@ export async function setupAdmin(_prev: FormState, f: FormData): Promise<FormSta
   if (password.length < 12) return { error: "Use a password of at least 12 characters." };
   if (password !== String(f.get("password2") ?? "")) return { error: "The passwords don't match." };
 
-  let secret: string;
-  try {
-    secret = unseal(str(f, "totpSealed"));
-  } catch {
-    return { error: "The setup form expired. Reload the page and scan the new QR code." };
+  let totpSecret: string | null = null;
+  if (!TEMP_ADMIN_2FA_OFF) {
+    let secret: string;
+    try {
+      secret = unseal(str(f, "totpSealed"));
+    } catch {
+      return { error: "The setup form expired. Reload the page and scan the new QR code." };
+    }
+    if (!verifyTotp(secret, str(f, "code"))) return { error: "That 6-digit code isn't right. Check the time on your phone and try again." };
+    totpSecret = seal(secret);
   }
-  if (!verifyTotp(secret, str(f, "code"))) return { error: "That 6-digit code isn't right. Check the time on your phone and try again." };
 
   const db = await getDb();
   const [admin] = await db
     .insert(adminUsers)
-    .values({ email, passwordHash: await hashPassword(password), totpSecret: seal(secret) })
+    .values({ email, passwordHash: await hashPassword(password), totpSecret })
     .returning();
   await startAdminSession(admin.id);
   redirect(base);
@@ -59,8 +77,27 @@ export async function loginAdmin(_prev: FormState, f: FormData): Promise<FormSta
   const db = await getDb();
   const [admin] = await db.select().from(adminUsers).where(eq(adminUsers.email, email));
   const passwordOk = await verifyPassword(String(f.get("password") ?? ""), admin?.passwordHash ?? "scrypt$AAAAAAAAAAAAAAAAAAAAAA==$AAAA");
-  const codeOk = admin ? verifyTotp(unseal(admin.totpSecret), str(f, "code")) : false;
-  if (!admin || !passwordOk || !codeOk) return { error: "Email, password or code is wrong.", email };
+  if (!admin || !passwordOk) return { error: TEMP_ADMIN_2FA_OFF ? "Email or password is wrong." : "Email, password or code is wrong.", email };
+
+  if (!TEMP_ADMIN_2FA_OFF) {
+    if (admin.totpSecret) {
+      if (!verifyTotp(unseal(admin.totpSecret), str(f, "code"))) return { error: "Email, password or code is wrong.", email };
+    } else {
+      // First sign-in since 2FA was switched on: add the authenticator app now.
+      const sealed = str(f, "enrollSealed");
+      if (!sealed) return { email, enroll: await enrolment(email) };
+      let secret: string;
+      try {
+        secret = unseal(sealed);
+      } catch {
+        return { email, enroll: await enrolment(email), error: "That expired. Scan the new QR code." };
+      }
+      if (!verifyTotp(secret, str(f, "code"))) {
+        return { email, enroll: { sealed, secret, qrSvg: await QRCode.toString(totpUri(secret, email), { type: "svg", margin: 0 }) }, error: "That code isn't right. Try the current one." };
+      }
+      await db.update(adminUsers).set({ totpSecret: seal(secret) }).where(eq(adminUsers.id, admin.id));
+    }
+  }
 
   await clearAttempts(`admin-login:email:${email}`);
   await startAdminSession(admin.id);

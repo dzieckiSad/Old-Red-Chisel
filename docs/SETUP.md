@@ -7,7 +7,7 @@ Po każdej zmianie zmiennych: **Deployments → ⋯ → Redeploy**.
 Dopóki czegoś brakuje, strona działa bezpiecznie:
 - bez bazy danych i Stripe sklep pokazuje „Online payment opens soon” i numer telefonu,
 - bez kluczy Stripe przycisk testowej płatności działa tylko lokalnie, nigdy w Vercelu,
-- panel admina działa tylko z bazą danych i ustawionymi kluczami (punkt 5).
+- bez bazy danych `/admin` pokazuje listę brakujących ustawień (punkt 5).
 
 ## 1. Baza danych (Neon, darmowa)
 1. Vercel → projekt → **Storage → Create Database → Neon (Serverless Postgres)** → plan Free → region **Europe (Frankfurt lub London)**.
@@ -45,8 +45,10 @@ Bez własnej domeny Resend wysyła tylko na Twój własny adres (do testów).
 
 ## 5. Panel admina
 
-Logowanie zawsze wymaga **e-maila, hasła i 6-cyfrowego kodu** z aplikacji w telefonie
-(Google Authenticator lub Microsoft Authenticator). Do panelu prowadzą dwie drogi:
+Na czas budowy strony logujesz się **e-mailem i hasłem** (bez kodu z aplikacji).
+Przed startem włączymy logowanie dwuetapowe (`TEMP_ADMIN_2FA_OFF` w `src/lib/admin-config.ts`):
+przy następnym logowaniu panel sam pokaże kod QR do zeskanowania aplikacją Google Authenticator
+lub Microsoft Authenticator. Do panelu prowadzą dwie drogi:
 
 ### Teraz, w trakcie budowy: prosty adres
 `https://oldredchisel.vercel.app/admin`. Tymczasowe, na Twoją prośbę. Przed startem strony zostanie
@@ -68,9 +70,9 @@ Przepustka działa w tej przeglądarce 12 godzin; potem logujesz się hasłem i 
 Do prostego adresu `/admin` wystarczą `SESSION_SECRET`, `ADMIN_SETUP_KEY` i **baza danych (punkt 1)**.
 
 ### Pierwsze uruchomienie
-1. Ustaw zmienne, zrób Redeploy, otwórz `/admin`.
-2. Wpisz `ADMIN_SETUP_KEY`, swój e-mail i hasło (12+ znaków).
-3. Zeskanuj kod QR aplikacją w telefonie i wpisz 6 cyfr. Konto można założyć tylko raz.
+1. Ustaw bazę danych (punkt 1) i zmienne `SESSION_SECRET` oraz `ADMIN_SETUP_KEY`, zrób Redeploy, otwórz `/admin`.
+   Jeśli czegoś brakuje, `/admin` pokaże listę „Almost there” z tym, co dodać.
+2. Wpisz `ADMIN_SETUP_KEY`, swój e-mail i hasło (12+ znaków). Konto można założyć tylko raz.
 
 ### Wejście z terminala (PC)
 Jednorazowo na komputerze: zainstaluj Node.js (20+) i Git, pobierz repozytorium
@@ -88,7 +90,9 @@ Potem za każdym razem: `npm run admin`. Plik `.env.admin` nie trafia do repozyt
 - hasło zaszyfrowane (scrypt), sekret aplikacji 2FA zaszyfrowany w bazie,
 - po 5 błędnych logowaniach na e-mail (10 na adres IP) blokada na 15 minut,
 - sesja wygasa po 8 godzinach, ciasteczka działają tylko pod adresem panelu,
-- **repozytorium ustaw jako prywatne** (GitHub → Settings → Danger Zone → Change visibility).
+- **repozytorium ustaw jako prywatne**: GitHub → repozytorium `Old-Red-Chisel` → **Settings** (zakładka u góry,
+  na telefonie w menu „…”) → na samym dole **Danger Zone** → **Change visibility** → **Make private** → potwierdź nazwą repozytorium.
+  Vercel dalej działa; jeśli poprosi o dostęp, zatwierdź go w GitHub → Settings → Applications → Vercel.
 
 ## Produkty w panelu
 Panel → **Products**:
@@ -100,6 +104,16 @@ Panel → **Products**:
 - usuwanie na dole strony produktu (kasuje też zdjęcia).
 Przykładowe produkty zostały wczytane jako widoczne. Zmień je albo ukryj.
 Opcje z dopłatami (drewno, wykończenie) są na razie ustawione w kodzie.
+
+## Ręczne zamówienia (klient nie płaci przez stronę)
+Panel → **Orders → + New order**: dla zamówień przez telefon albo na miejscu.
+- dane klienta, dostawa lub odbiór, pozycje: produkt ze sklepu albo dowolna pozycja
+  (np. „Szafa wnękowa, zaliczka”) z ceną, ilością i szczegółami,
+- płatność: gotówka, przelew, karta na miejscu, zaliczka (reszta później) albo płatność przy dostawie/odbiorze,
+- status, przewidywana data i notatka dla klienta.
+Po zapisaniu panel pokazuje **numer zamówienia i hasło** (i może je wysłać mailem). Klient loguje się nimi
+na stronie **Track your order** tak samo jak przy zamówieniu online.
+Gdy klient zgubi hasło: otwórz zamówienie → **Customer access → Generate new password**.
 
 ## Jak działa zamówienie (dla klienta)
 1. Koszyk → **Checkout**: dane, dostawa/montaż/odbiór, płatność kartą na naszej stronie.

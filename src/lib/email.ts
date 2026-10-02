@@ -29,9 +29,8 @@ async function send(to: string, subject: string, html: string, text: string, opt
   return true;
 }
 
-/** Where links in emails point: the live Vercel address until the domain in site.url is set up. */
-const siteUrl = () =>
-  process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : site.url;
+/** Where links in emails point: SITE_URL when set (any host), otherwise the address in site.ts. */
+const siteUrl = () => (process.env.SITE_URL || site.url).replace(/\/$/, "");
 
 const escape = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 

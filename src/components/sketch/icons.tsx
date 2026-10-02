@@ -38,9 +38,10 @@ const icons = {
     accent: "M36 31v7 M32.5 34.5h7",
   },
   hammer: {
-    lines: "M6 14l8-8 4 4 6-2 2 2-2 6 4 4-8 8-4-4-6-6z M21 23l18 18-3 3-18-18",
-    accent: "M38 6v12 M34 6h8",
+    lines: "M7 9h22v9H7z M29 11l8 2v4l-8 2 M15 18v25h6V18",
+    accent: "M7 13.5h22",
   },
+
   camera: {
     lines: "M5 16h9l3-5h14l3 5h9v24H5z M24 21a7 7 0 1 0 .01 0",
     accent: "M24 26a2 2 0 1 0 .01 0 M36 20h3",
@@ -97,6 +98,12 @@ const icons = {
     lines: "M24 44S11 31 11 21a13 13 0 1 1 26 0c0 10-13 23-13 23z",
     accent: "M24 16a5 5 0 1 0 .01 0",
   },
+  cart: {
+    lines: "M3 7h6l5 25h24l5-18H11 M18 40a2.5 2.5 0 1 0 .01 0 M34 40a2.5 2.5 0 1 0 .01 0",
+    accent: "M17 21h20",
+  },
+  menu: { lines: "M6 13h36 M6 24h36", accent: "M6 35h24" },
+  close: { lines: "M10 10l28 28", accent: "M38 10L10 38" },
   tick: { lines: "", accent: "M8 25l10 10L40 11" },
   arrow: { lines: "", accent: "M5 24h34 M29 14l11 10-11 10" },
 } satisfies Record<string, IconDef>;

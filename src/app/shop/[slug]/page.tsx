@@ -41,8 +41,8 @@ export default async function ProductPage({ params }: PageProps<"/shop/[slug]">)
           )}
         </nav>
 
-        <div className="mt-6 grid gap-10 md:grid-cols-2">
-          <div className="grid gap-3">
+        <div className="mt-6 grid items-start gap-10 md:grid-cols-2">
+          <div className="grid gap-3 md:sticky md:top-32">
             <PhotoPlaceholder label="Product photo" className="aspect-square" />
             <div className="grid grid-cols-3 gap-3">
               <PhotoPlaceholder className="aspect-square" />

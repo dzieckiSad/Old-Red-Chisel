@@ -4,12 +4,15 @@ import Link from "next/link";
 import { type ChangeEvent, type FormEvent, useActionState, useRef, useState, startTransition } from "react";
 import { submitQuote } from "@/app/quote/actions";
 import { MAX_PHOTOS, MAX_PHOTO_BYTES, type QuoteState, budgets, projectTypes, timings } from "@/lib/quote";
+import { SketchIcon } from "@/components/sketch/icons";
+import { CornerMarks } from "@/components/sketch/ornaments";
+import { ButtonArrow } from "@/components/ui";
 import { site } from "@/lib/site";
 
 const steps = ["Your project", "Details", "Contact"] as const;
 
 const inputClass =
-  "mt-1 block w-full border border-line bg-white px-3 py-2.5 text-ink focus:border-ink focus:outline-none";
+  "mt-1.5 block w-full border border-line border-b-2 border-b-ink/25 bg-cream/50 px-3 py-2.5 text-ink transition-colors placeholder:text-graphite/50 focus:border-b-brand focus:bg-white focus:outline-none";
 
 // Phone photos are often 3–8 MB; shrink them in the browser so several fit in one request.
 async function shrinkImage(file: File, maxSide = 1600): Promise<File> {
@@ -55,8 +58,10 @@ export function QuoteForm({
 
   if (state.status === "success") {
     return (
-      <div className="border border-line bg-white p-8">
-        <h2 className="font-serif text-2xl font-semibold text-ink">
+      <div className="relative border border-line bg-white p-8">
+        <CornerMarks />
+        <SketchIcon name="houseCheck" size={64} />
+        <h2 className="mt-4 font-serif text-2xl font-semibold text-ink">
           Thanks{state.name ? `, ${state.name}` : ""}. We&apos;ve got your request.
         </h2>
         <p className="mt-3 text-graphite">
@@ -67,8 +72,8 @@ export function QuoteForm({
           </a>
           .
         </p>
-        <Link href="/shop" className="mt-6 inline-block font-semibold text-brand hover:underline">
-          Browse the shop while you wait →
+        <Link href="/shop" className="btn btn--outline mt-6">
+          Browse the shop while you wait
         </Link>
       </div>
     );
@@ -99,8 +104,9 @@ export function QuoteForm({
     shrunk.forEach((f) => dt.items.add(f));
     input.files = dt.files;
     setPhotoNote(
-      `${shrunk.length} photo${shrunk.length === 1 ? "" : "s"} attached` +
-        ((input.files?.length ?? 0) < (e.target.files?.length ?? 0) ? ` (max ${MAX_PHOTOS})` : ""),
+      shrunk.length === 0
+        ? ""
+        : `${shrunk.map((f) => f.name).join(", ")}` + (picked.length < (e.target.files?.length ?? 0) ? ` (first ${MAX_PHOTOS} kept)` : ""),
     );
   }
 
@@ -112,21 +118,31 @@ export function QuoteForm({
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate={false} className="border border-line bg-white p-6 sm:p-8">
-      <ol className="mb-8 flex gap-2 text-sm">
+    <form onSubmit={onSubmit} className="relative border border-line bg-white p-6 sm:p-8">
+      <CornerMarks />
+      <ol className="mb-10 grid grid-cols-3 gap-2 text-sm">
         {steps.map((label, i) => (
-          <li
-            key={label}
-            aria-current={i === step ? "step" : undefined}
-            className={`flex-1 border-t-4 pt-2 ${i <= step ? "border-brand text-ink" : "border-line text-graphite"}`}
-          >
-            <span className="font-semibold">{i + 1}.</span> {label}
+          <li key={label} aria-current={i === step ? "step" : undefined} className="flex flex-col gap-2">
+            <span className="flex items-center gap-2">
+              <span
+                className={`grid h-8 w-8 shrink-0 place-items-center font-hand text-xl leading-none transition-colors ${
+                  i < step ? "bg-ink text-white" : i === step ? "bg-brand text-white" : "border border-line text-graphite"
+                }`}
+                style={{ clipPath: "polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px)" }}
+              >
+                {i < step ? "✓" : i + 1}
+              </span>
+              <span className={`hidden font-medium sm:inline ${i <= step ? "text-ink" : "text-graphite"}`}>{label}</span>
+            </span>
+            <span aria-hidden className="h-0.5 bg-line">
+              <span className={`block h-full bg-brand transition-[width] duration-500 ${i <= step ? "w-full" : "w-0"}`} />
+            </span>
           </li>
         ))}
       </ol>
 
       {state.status === "error" && (
-        <p role="alert" className="mb-6 bg-red-50 p-3 text-sm text-red-800">
+        <p role="alert" className="mb-6 border-l-4 border-brand bg-brand/5 p-3 text-sm text-brand-dark">
           {state.message}
         </p>
       )}
@@ -137,12 +153,12 @@ export function QuoteForm({
 
       <fieldset ref={(el) => { stepRefs.current[0] = el; }} hidden={step !== 0}>
         <legend className="font-serif text-2xl font-semibold text-ink">What are you planning?</legend>
-        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+        <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
           {projectTypes.map((t) => (
             <label
               key={t.value}
-              className={`cursor-pointer border p-4 font-medium ${
-                projectType === t.value ? "border-brand bg-brand/5 text-ink" : "border-line hover:border-ink/40"
+              className={`group relative flex cursor-pointer flex-col items-center gap-2 border p-4 text-center text-sm font-medium transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-brand ${
+                projectType === t.value ? "border-brand bg-brand/5 text-ink" : "border-line hover:border-ink/40 hover:bg-cream/60"
               }`}
             >
               <input
@@ -152,9 +168,13 @@ export function QuoteForm({
                 required
                 checked={projectType === t.value}
                 onChange={() => setProjectType(t.value)}
-                className="mr-2 accent-brand"
+                className="sr-only"
               />
+              <SketchIcon name={t.icon} size={48} className="transition-transform duration-300 group-hover:-rotate-3" />
               {t.label}
+              {projectType === t.value && (
+                <SketchIcon name="tick" size={22} className="absolute top-1.5 right-1.5" />
+              )}
             </label>
           ))}
         </div>
@@ -178,13 +198,18 @@ export function QuoteForm({
           Rough measurements <span className="font-normal text-graphite">(optional)</span>
           <input name="measurements" className={inputClass} placeholder="e.g. 3.2 m wide, 2.4 m high" />
         </label>
-        <label className="block text-sm font-medium">
+        <div className="text-sm font-medium">
           Photos of the space <span className="font-normal text-graphite">(optional, up to {MAX_PHOTOS})</span>
-          <input type="file" name="photos" accept="image/*" multiple onChange={onPhotos}
-            className="mt-1 block w-full text-sm file:mr-3 file: file:border-0 file:bg-sand file:px-4 file:py-2 file:font-semibold" />
-          <span className="mt-1 block text-xs text-graphite">{photoNote}</span>
+          <label className="mt-1.5 flex cursor-pointer items-center gap-4 border-2 border-dashed border-line bg-cream/50 p-4 transition-colors hover:border-brand has-[:focus-visible]:border-brand">
+            <SketchIcon name="camera" size={44} />
+            <span>
+              <span className="block font-semibold text-ink">{photoNote ? "Change photos" : "Add photos"}</span>
+              <span className="block font-normal text-graphite">{photoNote || "A few phone photos help us price it accurately."}</span>
+            </span>
+            <input type="file" name="photos" accept="image/*" multiple onChange={onPhotos} className="sr-only" />
+          </label>
           <FieldError message={errors.photos} />
-        </label>
+        </div>
         <div className="grid gap-5 sm:grid-cols-2">
           <label className="block text-sm font-medium">
             Budget
@@ -241,7 +266,7 @@ export function QuoteForm({
           </label>
         </div>
         <label className="flex gap-3 text-sm text-graphite">
-          <input type="checkbox" name="consent" required className="mt-0.5 accent-brand" />
+          <input type="checkbox" name="consent" required className="mt-0.5 h-4 w-4 shrink-0 accent-brand" />
           <span>
             I agree to Old Red Chisel using these details to reply to my request, as described in the{" "}
             <Link href="/legal/privacy" className="underline">privacy policy</Link>.
@@ -252,19 +277,20 @@ export function QuoteForm({
 
       <div className="mt-8 flex items-center justify-between gap-3">
         {step > 0 ? (
-          <button type="button" onClick={() => setStep((s) => s - 1)} className="px-4 py-3 text-sm font-semibold text-graphite hover:text-ink">
-            ← Back
+          <button type="button" onClick={() => setStep((s) => s - 1)} className="flex items-center gap-2 px-2 py-3 text-sm font-semibold text-graphite hover:text-ink">
+            <SketchIcon name="arrow" size={22} className="rotate-180" />
+            Back
           </button>
         ) : (
           <span />
         )}
         {step < steps.length - 1 ? (
           <button type="button" onClick={goNext} className="btn btn--dark">
-            Continue
+            Continue <ButtonArrow />
           </button>
         ) : (
           <button type="submit" disabled={pending} className="btn btn--primary disabled:opacity-60">
-            {pending ? "Sending…" : "Send my request"}
+            {pending ? "Sending…" : <>Send my request <ButtonArrow /></>}
           </button>
         )}
       </div>
@@ -274,5 +300,5 @@ export function QuoteForm({
 
 function FieldError({ message }: { message?: string }) {
   if (!message) return null;
-  return <span className="mt-1 block text-sm text-red-700">{message}</span>;
+  return <span className="mt-1 block text-sm font-medium text-brand">{message}</span>;
 }

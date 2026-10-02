@@ -5,6 +5,9 @@ import { useState } from "react";
 import { type Product, modeLabels } from "@/lib/catalog";
 import { addToCart } from "@/lib/cart";
 import { formatPrice } from "@/lib/format";
+import { SketchIcon } from "@/components/sketch/icons";
+import { CornerMarks, PencilNote } from "@/components/sketch/ornaments";
+import { ButtonArrow } from "@/components/ui";
 
 export function BuyBox({ product }: { product: Product }) {
   const options = product.options ?? [];
@@ -25,7 +28,8 @@ export function BuyBox({ product }: { product: Product }) {
 
   if (product.mode === "quote_only") {
     return (
-      <div className="border border-line bg-white p-5">
+      <div className="relative border border-line bg-white p-5">
+        <CornerMarks />
         <p className="text-sm text-graphite">Typical price</p>
         <p className="font-serif text-3xl font-semibold text-ink">from {formatPrice(product.price)}</p>
         <p className="mt-2 text-sm text-graphite">
@@ -35,19 +39,20 @@ export function BuyBox({ product }: { product: Product }) {
           href={quoteHref}
           className="btn btn--primary mt-5 w-full !text-base"
         >
-          Request a quote
+          Request a quote <ButtonArrow />
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="border border-line bg-white p-5">
+    <div className="relative border border-line bg-white p-5">
+      <CornerMarks />
       <div className="flex items-baseline justify-between">
         <p className="font-serif text-3xl font-semibold text-ink">{formatPrice(price)}</p>
         <span
-          className={`rounded-full px-3 py-1 text-xs font-medium ${
-            product.mode === "in_stock" ? "bg-green-100 text-green-800" : "bg-sand text-ink"
+          className={`px-2.5 py-1 text-[11px] font-semibold tracking-wide uppercase ${
+            soldOut ? "bg-ink/10 text-graphite" : product.mode === "in_stock" ? "bg-ink text-white" : "bg-sand text-ink"
           }`}
         >
           {soldOut ? "Sold out" : modeLabels[product.mode]}
@@ -64,8 +69,8 @@ export function BuyBox({ product }: { product: Product }) {
               return (
                 <label
                   key={choice.label}
-                  className={`cursor-pointer border px-3 py-2 text-sm ${
-                    checked ? "border-ink bg-ink text-white" : "border-line hover:border-ink/40"
+                  className={`cursor-pointer border px-3 py-2 text-sm transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-brand ${
+                    checked ? "border-ink bg-ink text-white" : "border-line hover:border-ink/40 hover:bg-cream"
                   }`}
                 >
                   <input
@@ -99,13 +104,15 @@ export function BuyBox({ product }: { product: Product }) {
         }}
         className="btn btn--primary mt-6 w-full !text-base disabled:cursor-not-allowed disabled:opacity-50"
       >
+        <SketchIcon name="cart" size={24} className="[--sketch-accent:white] [--sketch-ink:white]" />
         Add to cart
       </button>
-      <p aria-live="polite" className="mt-2 min-h-5 text-sm text-green-800">
+      <p aria-live="polite" className="mt-2 flex min-h-6 items-center gap-2 text-sm text-ink">
         {added && (
           <>
-            Added to your cart.{" "}
-            <Link href="/cart" className="font-semibold underline">
+            <SketchIcon name="tick" size={20} />
+            Added to your cart.
+            <Link href="/cart" className="font-semibold text-brand underline">
               View cart
             </Link>
           </>
@@ -114,10 +121,14 @@ export function BuyBox({ product }: { product: Product }) {
 
       <Link
         href={quoteHref}
-        className="mt-2 block border border-dashed border-line p-3 text-sm text-graphite hover:border-brand"
+        className="group mt-2 flex items-center gap-3 border-2 border-dashed border-line p-3 text-sm text-graphite transition-colors hover:border-brand"
       >
-        <span className="font-semibold text-ink">Need a different size or design?</span> We make
-        every piece ourselves, so we can build it to your measurements. →
+        <SketchIcon name="tape" size={40} />
+        <span>
+          <PencilNote className="block text-xl text-brand">need a different size?</PencilNote>
+          We make every piece ourselves, so we can build it to your measurements.
+        </span>
+        <SketchIcon name="arrow" size={22} className="ml-auto transition-transform group-hover:translate-x-1" />
       </Link>
     </div>
   );

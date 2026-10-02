@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Logo } from "@/components/logo";
+import { SketchIcon } from "@/components/sketch/icons";
 import { Container } from "@/components/ui";
 import { useCart } from "@/lib/cart";
 import { nav, site } from "@/lib/site";
@@ -34,8 +35,8 @@ export function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className={`text-sm font-medium hover:text-brand ${
-                pathname.startsWith(item.href) ? "text-brand" : "text-ink"
+              className={`relative py-1 text-sm font-medium transition-colors hover:text-brand after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-left after:bg-brand after:transition-transform after:duration-300 hover:after:scale-x-100 ${
+                pathname.startsWith(item.href) ? "text-brand after:scale-x-100" : "text-ink after:scale-x-0"
               }`}
             >
               {item.label}
@@ -46,11 +47,13 @@ export function Header() {
         <div className="flex items-center gap-2">
           <Link
             href="/cart"
-            className="relative px-3 py-2 text-sm font-medium text-ink hover:bg-sand"
+            aria-label={count > 0 ? `Cart, ${count} item${count === 1 ? "" : "s"}` : "Cart"}
+            className="relative flex items-center gap-1.5 px-2 py-2 text-sm font-medium text-ink hover:text-brand"
           >
-            Cart
+            <SketchIcon name="cart" size={30} />
+            <span className="hidden sm:inline">Cart</span>
             {count > 0 && (
-              <span className="ml-1.5 rounded-full bg-brand px-1.5 py-0.5 text-xs text-white">
+              <span className="font-hand absolute top-0 left-6 grid h-5 min-w-5 place-items-center bg-brand px-1 text-base leading-none text-white">
                 {count}
               </span>
             )}
@@ -63,12 +66,13 @@ export function Header() {
           </Link>
           <button
             type="button"
-            className="px-3 py-2 text-sm font-medium lg:hidden"
+            aria-label={open ? "Close menu" : "Open menu"}
+            className="p-2 lg:hidden"
             aria-expanded={open}
             aria-controls="mobile-nav"
             onClick={() => setOpen((v) => !v)}
           >
-            {open ? "Close" : "Menu"}
+            <SketchIcon name={open ? "close" : "menu"} size={30} />
           </button>
         </div>
       </Container>

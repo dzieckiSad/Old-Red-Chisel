@@ -1,14 +1,16 @@
+import type { IconName } from "@/components/sketch/icons";
+
 // Shared definitions for the quote request form (used by the client form and the server action).
 
 export const projectTypes = [
-  { value: "kitchens", label: "Kitchen", group: "bespoke" },
-  { value: "fitted-wardrobes", label: "Fitted wardrobes", group: "bespoke" },
-  { value: "other-bespoke", label: "Other built-in joinery", group: "bespoke" },
-  { value: "custom-product", label: "Custom shop piece", group: "bespoke" },
-  { value: "interior", label: "Interior renovation", group: "build" },
-  { value: "exterior", label: "Decking, fencing or garden", group: "build" },
-  { value: "extensions-conversions", label: "Extension or conversion", group: "build" },
-  { value: "small-jobs", label: "Small job", group: "build" },
+  { value: "kitchens", icon: "kitchen" as IconName, label: "Kitchen", group: "bespoke" },
+  { value: "fitted-wardrobes", icon: "wardrobe" as IconName, label: "Fitted wardrobes", group: "bespoke" },
+  { value: "other-bespoke", icon: "shelving" as IconName, label: "Other built-in joinery", group: "bespoke" },
+  { value: "custom-product", icon: "plane" as IconName, label: "Custom shop piece", group: "bespoke" },
+  { value: "interior", icon: "interior" as IconName, label: "Interior renovation", group: "build" },
+  { value: "exterior", icon: "exterior" as IconName, label: "Decking, fencing or garden", group: "build" },
+  { value: "extensions-conversions", icon: "extension" as IconName, label: "Extension or conversion", group: "build" },
+  { value: "small-jobs", icon: "hammer" as IconName, label: "Small job", group: "build" },
 ] as const;
 
 export const budgets = ["Under €1,000", "€1,000–€3,000", "€3,000–€10,000", "€10,000–€30,000", "Over €30,000", "Not sure yet"];

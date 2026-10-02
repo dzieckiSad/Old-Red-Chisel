@@ -84,6 +84,10 @@ ADMIN_ACCESS_KEY=<ten sam co w Vercelu>
 ```
 Potem za każdym razem: `npm run admin`. Plik `.env.admin` nie trafia do repozytorium.
 
+### Kilka osób (np. Ty i szef)
+Panel → **Team** → **Add a person**: e-mail i hasło startowe (przekaż je osobiście). Każdy loguje się swoim kontem
+i może zmienić hasło w **Team → My password**. Tam też odbierasz dostęp (**Remove access**).
+
 ### Zabezpieczenia panelu
 - adres wewnętrzny z kodu oraz tajny adres bez przepustki zwracają 404,
 - przepustka jest podpisana kluczem, ważna 2 minuty i działa tylko raz,

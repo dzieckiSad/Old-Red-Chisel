@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { type ChangeEvent, type FormEvent, useActionState, useRef, useState, startTransition } from "react";
-import { submitQuote } from "@/app/quote/actions";
+import { submitQuote } from "@/app/(site)/quote/actions";
 import { MAX_PHOTOS, MAX_PHOTO_BYTES, type QuoteState, budgets, projectTypes, timings } from "@/lib/quote";
 import { SketchIcon } from "@/components/sketch/icons";
 import { CornerMarks } from "@/components/sketch/ornaments";

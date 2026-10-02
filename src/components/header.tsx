@@ -20,9 +20,14 @@ export function Header() {
       <div className="hidden bg-ink text-xs text-white/80 sm:block">
         <Container className="flex justify-between py-2">
           <span>Handmade in our Athlone workshop · Serving the Midlands</span>
-          <a href={site.phoneHref} className="hover:text-white">
-            {site.phone}
-          </a>
+          <span className="flex gap-5">
+            <Link href="/track" className="hover:text-white">
+              Track your order
+            </Link>
+            <a href={site.phoneHref} className="hover:text-white">
+              {site.phone}
+            </a>
+          </span>
         </Container>
       </div>
       <Container className="flex items-center justify-between gap-4 py-3">
@@ -90,6 +95,9 @@ export function Header() {
                 {item.label}
               </Link>
             ))}
+            <Link href="/track" onClick={() => setOpen(false)} className="py-3 text-base font-medium text-ink">
+              Track your order
+            </Link>
             <Link
               href="/quote"
               onClick={() => setOpen(false)}

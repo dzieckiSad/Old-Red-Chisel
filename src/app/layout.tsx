@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { Caveat, Fraunces, Inter } from "next/font/google";
-import { Footer } from "@/components/footer";
-import { Header } from "@/components/header";
 import { SketchDefs } from "@/components/sketch/icons";
 import { site } from "@/lib/site";
 import "./globals.css";
@@ -29,9 +27,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en-IE" className={`${inter.variable} ${fraunces.variable} ${caveat.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col font-sans">
         <SketchDefs />
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        {children}
       </body>
     </html>
   );

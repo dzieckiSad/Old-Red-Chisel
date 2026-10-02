@@ -1,7 +1,7 @@
 # Uruchomienie zamówień, płatności i panelu admina
 
 Kod jest gotowy. Żeby działał na prawdziwej stronie, w Vercelu trzeba podłączyć kilka usług
-i wpisać ich klucze. Wszystko ustawiasz w: **Vercel → projekt `oldredchisel` → Settings → Environment Variables**.
+i wpisać ich klucze. Wszystko ustawiasz w: **Vercel → projekt `orc` → Settings → Environment Variables**.
 Po każdej zmianie zmiennych: **Deployments → ⋯ → Redeploy**.
 
 Dopóki czegoś brakuje, strona działa bezpiecznie:
@@ -17,12 +17,12 @@ Zmiana hasła wylogowuje wszystkich. Przy starcie sklepu usuń `SITE_PASSWORD` i
 
 ## 1. Baza danych (Neon, darmowa)
 1. Vercel → projekt → **Storage → Create Database → Neon (Serverless Postgres)** → plan Free → region **Europe (Frankfurt lub London)**.
-2. Połącz z projektem `oldredchisel` (wszystkie środowiska). Vercel sam doda `DATABASE_URL`.
+2. Połącz z projektem `orc` (wszystkie środowiska). Vercel sam doda `DATABASE_URL`.
 3. Tabele tworzą się same przy pierwszym uruchomieniu.
 
 ## 1b. Zdjęcia produktów (Vercel Blob, darmowy limit na start)
 1. Vercel → projekt → **Storage → Create Database → Blob** → nazwa np. `product-photos`.
-2. Połącz z projektem `oldredchisel`. Vercel sam doda `BLOB_READ_WRITE_TOKEN`.
+2. Połącz z projektem `orc`. Vercel sam doda `BLOB_READ_WRITE_TOKEN`.
 3. Od teraz zdjęcia dodane w panelu (Products → produkt → Add photos) trafiają do Blob.
 
 ## 2. Sekret sesji
@@ -35,7 +35,7 @@ Jego zmiana wyloguje wszystkich i unieważni niewysłane hasła zamówień, wię
    - `Publishable key` → `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
    - `Secret key` → `STRIPE_SECRET_KEY`
 3. **Developers → Webhooks → Add endpoint**:
-   - URL: `https://oldredchisel.vercel.app/api/stripe/webhook` (później Twoja domena),
+   - URL: `https://orc-five.vercel.app/api/stripe/webhook` (później Twoja domena),
    - zdarzenie: `payment_intent.succeeded`,
    - skopiuj `Signing secret` → `STRIPE_WEBHOOK_SECRET`.
 4. **Settings → Payment methods**: włącz karty, Apple Pay, Google Pay.
@@ -51,7 +51,7 @@ Bez własnej domeny Resend wysyła tylko na Twój własny adres (do testów).
 
 ## 5. Panel admina
 
-Adres: **`https://oldredchisel.vercel.app/admin`** (później Twoja domena + `/admin`). Znacie go Ty i szef.
+Adres: **`https://orc-five.vercel.app/admin`** (później Twoja domena + `/admin`). Znacie go Ty i szef.
 Na czas budowy strony logujesz się **e-mailem i hasłem**. Przed startem włączymy logowanie dwuetapowe
 (`TEMP_ADMIN_2FA_OFF` w `src/lib/admin-config.ts`): przy następnym logowaniu panel sam pokaże kod QR
 do zeskanowania aplikacją Google Authenticator lub Microsoft Authenticator.

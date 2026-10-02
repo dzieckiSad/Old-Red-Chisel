@@ -1,11 +1,11 @@
 import "server-only";
-import { count, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { cookies, headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { ADMIN_PATH } from "@/lib/admin-config";
 import { getDb, isDatabaseConfigured } from "@/lib/db";
-import { adminUsers } from "@/lib/db/schema";
-import { signToken, verifyToken } from "@/lib/security";
+import { adminSettings } from "@/lib/db/schema";
+import { keyedDigest, signToken, verifyToken } from "@/lib/security";
 
 const SESSION_COOKIE = "orc_admin";
 const SESSION_TTL = 60 * 60 * 8; // sign in again after 8 hours
@@ -35,35 +35,50 @@ export function adminConfigIssues() {
   if (process.env.VERCEL && (process.env.SESSION_SECRET ?? "").length < 32) {
     issues.push({ name: "SESSION_SECRET", how: "Settings → Environment Variables: any random text of 40+ characters." });
   }
+  if (adminPassword().length < 12) {
+    issues.push({ name: "ADMIN_PASSWORD", how: "Settings → Environment Variables: the panel password, 12+ characters." });
+  }
   return issues;
 }
 
-export async function adminCount() {
-  const db = await getDb();
-  const [row] = await db.select({ n: count() }).from(adminUsers);
-  return Number(row?.n ?? 0);
+/** The one shared panel password, set in Vercel. */
+export function adminPassword() {
+  return process.env.ADMIN_PASSWORD ?? "";
 }
 
+/** Changes whenever ADMIN_PASSWORD changes, so a new password signs everyone out. */
+function passwordStamp() {
+  return keyedDigest("admin-password-v1", adminPassword()).slice(0, 22);
+}
+
+/** Authenticator secret (sealed), stored once two-step sign-in is switched on. */
+export async function storedTotpSecret() {
+  const db = await getDb();
+  const [row] = await db.select().from(adminSettings).where(eq(adminSettings.key, "totp"));
+  return row?.value ?? null;
+}
+
+export async function saveTotpSecret(sealed: string) {
+  const db = await getDb();
+  await db.insert(adminSettings).values({ key: "totp", value: sealed }).onConflictDoUpdate({ target: adminSettings.key, set: { value: sealed } });
+}
+
+/** True when this browser is signed in to the panel. */
 export async function currentAdmin() {
   await adminBase();
-  if (adminConfigIssues().length) return null;
-  const payload = verifyToken<{ adminId: string }>((await cookies()).get(SESSION_COOKIE)?.value);
-  if (!payload) return null;
-  const db = await getDb();
-  const [admin] = await db.select().from(adminUsers).where(eq(adminUsers.id, payload.adminId));
-  return admin ?? null;
+  if (adminConfigIssues().length) return false;
+  const payload = verifyToken<{ stamp: string }>((await cookies()).get(SESSION_COOKIE)?.value);
+  return payload?.stamp === passwordStamp();
 }
 
 /** Every admin action must call this first: server actions can be invoked directly. */
 export async function requireAdmin() {
-  const admin = await currentAdmin();
-  if (!admin) throw new Error("Not signed in");
-  return admin;
+  if (!(await currentAdmin())) throw new Error("Not signed in");
 }
 
-export async function startAdminSession(adminId: string) {
+export async function startAdminSession() {
   const base = await adminBase();
-  (await cookies()).set(SESSION_COOKIE, signToken({ adminId }, SESSION_TTL), {
+  (await cookies()).set(SESSION_COOKIE, signToken({ stamp: passwordStamp() }, SESSION_TTL), {
     ...cookieOptions(base, SESSION_TTL),
     sameSite: "strict",
   });

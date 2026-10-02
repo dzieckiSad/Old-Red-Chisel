@@ -52,31 +52,29 @@ Bez własnej domeny Resend wysyła tylko na Twój własny adres (do testów).
 ## 5. Panel admina
 
 Adres: **`https://orc-five.vercel.app/admin`** (później Twoja domena + `/admin`). Znacie go Ty i szef.
-Na czas budowy strony logujesz się **e-mailem i hasłem**. Przed startem włączymy logowanie dwuetapowe
-(`TEMP_ADMIN_2FA_OFF` w `src/lib/admin-config.ts`): przy następnym logowaniu panel sam pokaże kod QR
-do zeskanowania aplikacją Google Authenticator lub Microsoft Authenticator.
+Nie ma kont: jest **jeden panel i jedno stałe hasło**, to samo dla Ciebie i szefa.
 
 ### Ustawienia w Vercelu (Environment Variables)
 | Nazwa | Wartość |
 |---|---|
 | `SESSION_SECRET` | losowe 40+ znaków (punkt 2) |
-| `ADMIN_SETUP_KEY` | losowe 16+ znaków, potrzebne raz przy zakładaniu pierwszego konta |
+| `ADMIN_PASSWORD` | hasło do panelu, 12+ znaków |
 
-Oraz **baza danych** (punkt 1).
+Oraz **baza danych** (punkt 1). Potem Redeploy i otwórz `/admin`. Jeśli czegoś brakuje, panel pokaże listę
+„Almost there” z tym, co dodać.
 
-### Pierwsze uruchomienie
-1. Ustaw bazę danych i obie zmienne, zrób Redeploy, otwórz `/admin`.
-   Jeśli czegoś brakuje, `/admin` pokaże listę „Almost there” z tym, co dodać.
-2. Wpisz `ADMIN_SETUP_KEY`, swój e-mail i hasło (12+ znaków). Pierwsze konto można założyć tylko raz.
+**Zmiana hasła:** zmień `ADMIN_PASSWORD` w Vercelu i zrób Redeploy. Wszyscy zalogowani zostaną wylogowani.
 
-### Kilka osób (np. Ty i szef)
-Panel → **Team** → **Add a person**: e-mail i hasło startowe (przekaż je osobiście). Każdy loguje się swoim kontem
-i może zmienić hasło w **Team → My password**. Tam też odbierasz dostęp (**Remove access**).
+### Po skończeniu strony: kod z Google Authenticator
+Przed startem zmienimy `TEMP_ADMIN_2FA_OFF` na `false` (`src/lib/admin-config.ts`). Wtedy:
+1. Przy pierwszym logowaniu panel pokaże **kod QR**. Zeskanujcie go aplikacją Google Authenticator
+   na **obu telefonach** (Twoim i szefa) od razu, bo QR pokazuje się tylko raz.
+2. Każde kolejne logowanie: hasło + **6-cyfrowy kod z aplikacji** (zmienia się co 30 sekund).
 
 ### Zabezpieczenia panelu
 - każda strona i akcja panelu wymaga zalogowania; wewnętrzny adres panelu z kodu zwraca 404,
-- hasła są zaszyfrowane (scrypt),
-- po 5 błędnych logowaniach na e-mail (10 na adres IP) blokada na 15 minut,
+- hasło nie jest zapisane w kodzie ani w bazie, tylko w ustawieniach Vercela,
+- po 10 błędnych próbach z jednego adresu IP (50 łącznie) blokada na 15 minut,
 - sesja wygasa po 8 godzinach, ciasteczko działa tylko pod `/admin`,
 - **repozytorium ustaw jako prywatne**: GitHub → repozytorium `Old-Red-Chisel` → **Settings** (zakładka u góry,
   na telefonie w menu „…”) → na samym dole **Danger Zone** → **Change visibility** → **Make private** → potwierdź nazwą repozytorium.

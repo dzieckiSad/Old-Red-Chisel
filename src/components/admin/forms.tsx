@@ -1,7 +1,7 @@
 "use client";
 
 import { type FormEvent, startTransition, useActionState } from "react";
-import { type FormState, loginAdmin, saveOrderStatus, setupAdmin } from "@/app/orc-admin-internal/actions";
+import { type FormState, loginAdmin, saveOrderStatus } from "@/app/orc-admin-internal/actions";
 import { SketchIcon } from "@/components/sketch/icons";
 import type { OrderStatus } from "@/lib/db/schema";
 import { statusLabels } from "@/lib/order-status";
@@ -47,53 +47,18 @@ function useNoResetSubmit(action: (data: FormData) => void) {
   };
 }
 
-export function SetupForm({ twoFactor }: { twoFactor: { sealed: string; qrSvg: string; secret: string } | null }) {
-  const [state, action, pending] = useActionState(setupAdmin, {});
-  return (
-    <form onSubmit={useNoResetSubmit(action)} className="space-y-5">
-      <ErrorNote state={state} />
-      <label className="block text-sm font-medium">
-        Setup key <span className="font-normal text-graphite">(ADMIN_SETUP_KEY from Vercel)</span>
-        <input name="setupKey" type="password" required autoComplete="off" className={adminInput} />
-      </label>
-      <label className="block text-sm font-medium">
-        Your email
-        <input name="email" type="email" required autoComplete="username" className={adminInput} />
-      </label>
-      <div className="grid gap-5 sm:grid-cols-2">
-        <label className="block text-sm font-medium">
-          New password <span className="font-normal text-graphite">(12+ characters)</span>
-          <input name="password" type="password" required minLength={12} autoComplete="new-password" className={adminInput} />
-        </label>
-        <label className="block text-sm font-medium">
-          Repeat password
-          <input name="password2" type="password" required minLength={12} autoComplete="new-password" className={adminInput} />
-        </label>
-      </div>
-      {twoFactor && <Authenticator {...twoFactor} sealedName="totpSealed" />}
-      <button type="submit" disabled={pending} className="btn btn--primary w-full disabled:opacity-60">
-        {pending ? "Saving…" : "Create admin account"}
-      </button>
-    </form>
-  );
-}
-
 export function LoginForm({ twoFactor }: { twoFactor: boolean }) {
   const [state, action, pending] = useActionState(loginAdmin, {});
   return (
     <form onSubmit={useNoResetSubmit(action)} className="space-y-5">
       <ErrorNote state={state} />
       <label className="block text-sm font-medium">
-        Email
-        <input name="email" type="email" required autoComplete="username" className={adminInput} />
-      </label>
-      <label className="block text-sm font-medium">
-        Password
-        <input name="password" type="password" required autoComplete="current-password" className={adminInput} />
+        Panel password
+        <input name="password" type="password" required autoFocus autoComplete="current-password" className={adminInput} />
       </label>
       {state.enroll ? (
         <>
-          <p className="text-sm text-graphite">Two-step sign-in is now on. Add this account to your authenticator app once:</p>
+          <p className="text-sm text-graphite">Two-step sign-in is now on. Scan this once on every phone that signs in to the panel:</p>
           <Authenticator {...state.enroll} sealedName="enrollSealed" />
         </>
       ) : (

@@ -88,12 +88,10 @@ export const products = pgTable("products", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-export const adminUsers = pgTable("admin_users", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  email: text("email").notNull().unique(),
-  passwordHash: text("password_hash").notNull(),
-  totpSecret: text("totp_secret"),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+/** Panel-wide settings, e.g. the sealed authenticator secret once two-step sign-in is on. */
+export const adminSettings = pgTable("admin_settings", {
+  key: text("key").primaryKey(),
+  value: text("value").notNull(),
 });
 
 export const loginAttempts = pgTable("login_attempts", {
@@ -166,14 +164,10 @@ create table if not exists products (
   updated_at timestamptz not null default now()
 );
 create index if not exists products_listing_idx on products (hidden, sort_order);
-create table if not exists admin_users (
-  id uuid primary key default gen_random_uuid(),
-  email text not null unique,
-  password_hash text not null,
-  totp_secret text,
-  created_at timestamptz not null default now()
+create table if not exists admin_settings (
+  key text primary key,
+  value text not null
 );
-alter table admin_users alter column totp_secret drop not null;
 create table if not exists login_attempts (
   key text primary key,
   count integer not null,

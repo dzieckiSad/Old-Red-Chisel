@@ -4,6 +4,7 @@ import { getDb } from "@/lib/db";
 import { type OrderStatus, orders, products } from "@/lib/db/schema";
 import { isSampleImage } from "@/lib/project-types";
 import { getProjects } from "@/lib/projects";
+import { countNewQuotes } from "@/lib/quotes";
 
 // Figures for the admin dashboard. "Order value" counts every order that isn't awaiting online
 // payment or cancelled, by the month it was placed (Irish time).
@@ -25,7 +26,7 @@ export async function getDashboard() {
 
   // The zone is inlined (not a bound parameter) so SELECT and GROUP BY are the same expression.
   const monthExpr = sql<string>`to_char(${orders.createdAt} at time zone 'Europe/Dublin', 'YYYY-MM')`;
-  const [monthRows, stageRows, toCollect, lowStock, recent, projects] = await Promise.all([
+  const [monthRows, stageRows, toCollect, lowStock, recent, projects, newQuotes] = await Promise.all([
     db
       .select({ month: monthExpr, total: sql<number>`coalesce(sum(${orders.total}), 0)`, orders: count() })
       .from(orders)
@@ -43,6 +44,7 @@ export async function getDashboard() {
       .orderBy(products.stock),
     db.select().from(orders).where(notInArray(orders.status, ["pending_payment"])).orderBy(desc(orders.createdAt)).limit(6),
     getProjects({ includeHidden: true }),
+    countNewQuotes(),
   ]);
 
   // Six months, oldest first, including months with no orders.
@@ -76,5 +78,6 @@ export async function getDashboard() {
     recent,
     exampleProjects: projects.filter((p) => [p.before, p.after].some((img) => img && isSampleImage(img.url))).length,
     projects: projects.length,
+    newQuotes,
   };
 }

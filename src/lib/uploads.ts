@@ -18,11 +18,12 @@ export function uploadsAvailable() {
 
 export class UploadError extends Error {}
 
-export async function saveImage(file: File, prefix: string, folder: "products" | "projects" = "products") {
+export async function saveImage(file: File, prefix: string, folder: "products" | "projects" | "quotes" = "products") {
   const ext = TYPES[file.type];
   if (!ext) throw new UploadError("Use JPG, PNG, WebP or AVIF photos.");
   if (file.size > MAX_IMAGE_BYTES) throw new UploadError("Each photo must be under 8 MB.");
-  const name = `${prefix}-${randomBytes(6).toString("hex")}.${ext}`;
+  // Customer photos (quotes) get a longer random name and are only served to the admin panel.
+  const name = folder === "quotes" ? `quote-${randomBytes(16).toString("hex")}.${ext}` : `${prefix}-${randomBytes(6).toString("hex")}.${ext}`;
 
   if (process.env.BLOB_READ_WRITE_TOKEN) {
     const { put } = await import("@vercel/blob");
@@ -48,8 +49,10 @@ export async function deleteImage(url: string) {
   }
 }
 
-export async function readLocalImage(name: string) {
+/** A photo from the data directory. Quote photos only when `allowPrivate` (admin panel). */
+export async function readLocalImage(name: string, { allowPrivate = false } = {}) {
   if (isServerless() || !/^[a-z0-9-]+\.(jpg|png|webp|avif)$/.test(name)) return null;
+  if (name.startsWith("quote-") && !allowPrivate) return null;
   try {
     return { data: await readFile(path.join(LOCAL_DIR, name)), ext: name.split(".").pop()! };
   } catch {

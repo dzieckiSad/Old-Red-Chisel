@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { SketchIcon } from "@/components/sketch/icons";
 import { adminBase, adminConfigIssues, currentAdmin } from "@/lib/admin-auth";
+import { countNewQuotes } from "@/lib/quotes";
 import { logoutAdmin } from "./actions";
 
 export const metadata: Metadata = {
@@ -14,6 +15,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const base = await adminBase();
   const issues = adminConfigIssues();
   const admin = issues.length ? false : await currentAdmin();
+  const newQuotes = admin ? await countNewQuotes().catch(() => 0) : 0;
   return (
     <div className="min-h-full bg-sand/50">
       <header className="border-b border-line bg-ink text-white">
@@ -26,6 +28,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <nav className="order-last -mx-3 flex w-full flex-wrap items-center gap-1 text-sm font-semibold md:order-none md:mx-0 md:w-auto">
               <Link href={base} className="px-3 py-1.5 hover:bg-white/10">Dashboard</Link>
               <Link href={`${base}/orders`} className="px-3 py-1.5 hover:bg-white/10">Orders</Link>
+              <Link href={`${base}/quotes`} className="relative px-3 py-1.5 hover:bg-white/10">
+                Quotes
+                {newQuotes > 0 && <span className="ml-1.5 bg-brand px-1.5 py-0.5 text-[11px] leading-none">{newQuotes}</span>}
+              </Link>
               <Link href={`${base}/products`} className="px-3 py-1.5 hover:bg-white/10">Products</Link>
               <Link href={`${base}/projects`} className="px-3 py-1.5 hover:bg-white/10">Projects</Link>
               <Link href={`${base}/content`} className="px-3 py-1.5 hover:bg-white/10">Content</Link>

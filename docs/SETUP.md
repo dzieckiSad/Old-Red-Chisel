@@ -130,6 +130,14 @@ Panel → **Products**:
 Przykładowe produkty zostały wczytane jako widoczne. Zmień je albo ukryj.
 Opcje z dopłatami (drewno, wykończenie) są na razie ustawione w kodzie.
 
+## Zapytania o wycenę (Quotes)
+Każde zapytanie z „Get a free quote” zapisuje się w panelu → **Quotes** (i przychodzi mailem, jeśli Resend jest
+podłączony). Liczba nowych zapytań świeci się przy zakładce i na pulpicie.
+- otwierasz zapytanie: opis, wymiary, budżet, termin, **zdjęcia klienta**, przyciski Zadzwoń / WhatsApp / Odpowiedz mailem,
+- **status**: New → Contacted → Price sent → Survey booked → Won / Lost, plus **notatki** widoczne tylko dla Ciebie,
+- **usuwanie** kasuje zapytanie razem ze zdjęciami (np. gdy klient poprosi o usunięcie danych).
+Zdjęcia klientów nie są publiczne: na zwykłym serwerze otwiera je tylko zalogowany admin.
+
 ## Realizacje (Projects)
 Panel → **Projects**: prace pokazywane na stronie **Projects** z suwakiem przed/po.
 - **+ New project**: tytuł, miejscowość, rodzaj pracy, krótki opis, historia, materiały, czas realizacji,

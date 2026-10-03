@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/logo";
+import { SketchIcon } from "@/components/sketch/icons";
 import { Container } from "@/components/ui";
 import { categories } from "@/lib/catalog";
 import { getServices } from "@/lib/services";
@@ -53,6 +54,12 @@ export async function Footer() {
               {contact.email}
             </a>
           </p>
+          {contact.facebook && (
+            <a href={contact.facebook} target="_blank" rel="noopener" className="group mt-4 inline-flex items-center gap-2 text-sm font-semibold text-white hover:text-brand">
+              <SketchIcon name="facebook" size={30} className="[--sketch-ink:white] transition-transform group-hover:-rotate-6" />
+              Follow us on Facebook
+            </a>
+          )}
         </div>
         {columns.map((col) => (
           <div key={col.title}>

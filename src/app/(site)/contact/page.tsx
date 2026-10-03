@@ -17,6 +17,7 @@ export default async function ContactPage() {
     { icon: "mail", label: "Email", value: site.email, href: `mailto:${site.email}` },
     { icon: "pin", label: "Workshop", value: site.address, href: site.mapsHref },
     { icon: "clock", label: "Workshop hours", value: site.hours },
+    ...(site.facebook ? [{ icon: "facebook" as const, label: "Facebook", value: "Old Red Chisel", href: site.facebook }] : []),
   ];
   return (
     <>

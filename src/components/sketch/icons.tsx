@@ -102,6 +102,10 @@ const icons = {
     lines: "M3 7h6l5 25h24l5-18H11 M18 40a2.5 2.5 0 1 0 .01 0 M34 40a2.5 2.5 0 1 0 .01 0",
     accent: "M17 21h20",
   },
+  facebook: {
+    lines: "M9 6h30a3 3 0 0 1 3 3v30a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3z",
+    accent: "M31 15h-4a5 5 0 0 0-5 5v22 M17 26h13",
+  },
   menu: { lines: "M6 13h36 M6 24h36", accent: "M6 35h24" },
   close: { lines: "M10 10l28 28", accent: "M38 10L10 38" },
   tick: { lines: "", accent: "M8 25l10 10L40 11" },

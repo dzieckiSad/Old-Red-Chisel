@@ -14,6 +14,8 @@ export type SiteContent = {
     county: string;
     hours: string;
     mapsHref: string;
+    /** Facebook page link. Empty = not shown. */
+    facebook: string;
   };
   surveyFee: number; // EUR, deducted from the order
   quoteResponseHours: number;
@@ -38,6 +40,7 @@ export const defaultContent: SiteContent = {
     county: "Co. Westmeath",
     hours: "Mon – Fri, 9:00 – 17:30",
     mapsHref: "https://maps.app.goo.gl/boCn4FWCBCWbT2wEA?g_st=ic",
+    facebook: "https://www.facebook.com/share/1BrLMLQpPV/",
   },
   surveyFee: 75,
   quoteResponseHours: 48,

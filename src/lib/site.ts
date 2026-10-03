@@ -7,9 +7,6 @@ export const site = {
     "Handmade joinery, bespoke kitchens and fitted wardrobes, and complete home renovations from our workshop in Athlone.",
   url: "https://www.oldredchisel.ie", // TODO: confirm once the domain is bought
   serviceArea: ["Athlone", "Westmeath", "Roscommon", "Longford", "Offaly", "East Galway"],
-  social: {
-    facebook: "", // TODO: add Facebook page URL
-  },
   company: {
     cro: "", // TODO: CRO number
     vat: "", // TODO: VAT number

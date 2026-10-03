@@ -109,6 +109,31 @@ export const projects = pgTable("projects", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const quoteStatuses = ["new", "contacted", "quoted", "survey_booked", "won", "lost"] as const;
+export type QuoteStatus = (typeof quoteStatuses)[number];
+
+/** Quote requests sent from the website form. */
+export const quotes = pgTable("quotes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  status: text("status").$type<QuoteStatus>().notNull().default("new"),
+  projectType: text("project_type").notNull(),
+  product: text("product").notNull().default(""),
+  description: text("description").notNull(),
+  measurements: text("measurements").notNull().default(""),
+  budget: text("budget").notNull().default(""),
+  timing: text("timing").notNull().default(""),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  town: text("town").notNull(),
+  eircode: text("eircode").notNull().default(""),
+  contactPreference: text("contact_preference").notNull().default(""),
+  photos: jsonb("photos").$type<string[]>().notNull().default([]),
+  notes: text("notes").notNull().default(""),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 /** Panel-wide settings, e.g. the sealed authenticator secret once two-step sign-in is on. */
 export const adminSettings = pgTable("admin_settings", {
   key: text("key").primaryKey(),
@@ -205,6 +230,27 @@ create table if not exists projects (
   updated_at timestamptz not null default now()
 );
 create index if not exists projects_listing_idx on projects (hidden, sort_order);
+create table if not exists quotes (
+  id uuid primary key default gen_random_uuid(),
+  status text not null default 'new',
+  project_type text not null,
+  product text not null default '',
+  description text not null,
+  measurements text not null default '',
+  budget text not null default '',
+  timing text not null default '',
+  name text not null,
+  email text not null,
+  phone text not null,
+  town text not null,
+  eircode text not null default '',
+  contact_preference text not null default '',
+  photos jsonb not null default '[]',
+  notes text not null default '',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+create index if not exists quotes_status_idx on quotes (status, created_at desc);
 create table if not exists admin_settings (
   key text primary key,
   value text not null

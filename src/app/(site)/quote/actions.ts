@@ -1,5 +1,9 @@
 "use server";
 
+import { isDatabaseConfigured } from "@/lib/db";
+import { notifyWorkshopOfQuote } from "@/lib/email";
+import { saveQuote } from "@/lib/quotes";
+import { saveImage, uploadsAvailable } from "@/lib/uploads";
 import {
   MAX_PHOTOS,
   MAX_PHOTO_BYTES,
@@ -56,9 +60,44 @@ export async function submitQuote(_prev: QuoteState, formData: FormData): Promis
     return { status: "error", message: "Please check the highlighted fields.", fieldErrors };
   }
 
-  // TODO: save the request in the CMS, store photos in object storage and email the workshop.
-  // Until then requests only appear in the server log.
-  console.info("Quote request", { ...request, photos: photos.map((p) => `${p.name} (${p.size} B)`) });
+  // Saved in the admin panel (Quotes) and emailed to the workshop with the photos attached.
+  // Either one is enough; the customer only sees an error if both fail.
+  const label = projectTypes.find((t) => t.value === request.projectType)?.label ?? request.projectType;
+  const [saved, emailed] = await Promise.all([
+    (async () => {
+      if (!isDatabaseConfigured()) return false;
+      const urls: string[] = [];
+      if (uploadsAvailable()) {
+        for (const p of photos) {
+          try {
+            urls.push(await saveImage(p, "quote", "quotes"));
+          } catch (err) {
+            console.warn("Quote photo not stored", err);
+          }
+        }
+      }
+      await saveQuote({ ...request, projectType: label, photos: urls });
+      return true;
+    })().catch((err) => {
+      console.error("Quote not saved", err);
+      return false;
+    }),
+    (async () => {
+      const attachments = await Promise.all(
+        photos.map(async (p, i) => ({ filename: p.name || `photo-${i + 1}.jpg`, content: Buffer.from(await p.arrayBuffer()).toString("base64") })),
+      );
+      return notifyWorkshopOfQuote({ ...request, projectType: label }, attachments);
+    })().catch((err) => {
+      console.error("Quote email failed", err);
+      return false;
+    }),
+  ]);
+  if (!saved && !emailed) {
+    console.info("Quote request (not saved or emailed)", { ...request, photos: photos.map((p) => `${p.name} (${p.size} B)`) });
+    if (isDatabaseConfigured() || process.env.RESEND_API_KEY) {
+      return { status: "error", message: "Sorry, we couldn't send your request just now. Please try again, or call or WhatsApp us." };
+    }
+  }
 
   return { status: "success", name: request.name.split(" ")[0] };
 }

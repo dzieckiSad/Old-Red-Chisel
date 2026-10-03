@@ -26,7 +26,7 @@ export default async function AdminProjectsPage({ searchParams }: PageProps<"/or
       {deleted && <p role="status" className="mt-4 text-sm font-medium">Project deleted.</p>}
       {!uploadsAvailable() && (
         <p className="mt-4 border-l-4 border-oak bg-white p-3 text-sm">
-          Photo uploads need Vercel Blob: Vercel → Storage → Create → Blob, connect it to this project and redeploy.
+          This host doesn&apos;t keep uploaded files: set BLOB_READ_WRITE_TOKEN (Vercel Blob) and redeploy.
         </p>
       )}
 

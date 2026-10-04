@@ -31,12 +31,12 @@ export function ProductCard({ product }: { product: Product }) {
           </span>
         )}
       </div>
-      <div className="flex items-start justify-between gap-3 px-1.5 pt-3 pb-1.5">
+      <div className="flex flex-col gap-1 px-1.5 pt-3 pb-1.5 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
         <div>
           <h3 className="font-medium text-ink group-hover:text-brand">{product.name}</h3>
           <p className="mt-0.5 text-xs text-graphite">{modeLabels[product.mode]}</p>
         </div>
-        <p className="shrink-0 text-right font-semibold text-ink">
+        <p className="font-semibold text-ink sm:shrink-0 sm:text-right">
           {product.mode === "quote_only" ? (
             `from ${formatPrice(product.price)}`
           ) : sale ? (

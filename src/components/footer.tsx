@@ -67,7 +67,7 @@ export async function Footer() {
             <ul className="mt-4 space-y-2 text-sm">
               {col.links.map((l) => (
                 <li key={l.href}>
-                  <Link href={l.href} className="hover:text-white">
+                  <Link href={l.href} className="inline-block py-1 hover:text-white">
                     {l.label}
                   </Link>
                 </li>

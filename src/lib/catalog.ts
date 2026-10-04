@@ -208,6 +208,25 @@ export const sampleProducts: Product[] = [
   },
 ];
 
+/** Products with a drawn example image (src/assets/products/<slug>.jpg, mapped in product-photo.tsx). */
+const exampleImageSlugs = new Set([
+  "shannon-bedside-locker",
+  "lough-ree-bedside-locker",
+  "midlands-home-bar",
+  "bespoke-bar",
+  "athlone-sideboard",
+  "hall-cabinet",
+  "media-unit",
+  "floating-shelves",
+  "oak-chopping-board",
+]);
+
+/** For the shop: a product without uploaded photos shows its example image, if it has one. */
+export function withExampleImage<T extends Pick<Product, "slug" | "name" | "images">>(p: T): T {
+  if (p.images?.length || !exampleImageSlugs.has(p.slug)) return p;
+  return { ...p, images: [{ url: `sample:${p.slug}`, alt: p.name }] };
+}
+
 function todayInIreland() {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Dublin" }).format(new Date());
 }

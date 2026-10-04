@@ -1,6 +1,6 @@
 import "server-only";
 import { and, asc, count, eq, sql } from "drizzle-orm";
-import { type Product, sampleProducts } from "@/lib/catalog";
+import { type Product, sampleProducts, withExampleImage } from "@/lib/catalog";
 import { getDb, isDatabaseConfigured } from "@/lib/db";
 import { products } from "@/lib/db/schema";
 
@@ -85,7 +85,7 @@ const dbEnabled = () =>
 
 export async function getProducts(filter?: { category?: string; includeHidden?: boolean }): Promise<Product[]> {
   if (!dbEnabled()) {
-    return sampleProducts.filter((p) => !filter?.category || p.category === filter.category);
+    return sampleProducts.filter((p) => !filter?.category || p.category === filter.category).map(withExampleImage);
   }
   const d = await db();
   const conditions = [];
@@ -96,7 +96,7 @@ export async function getProducts(filter?: { category?: string; includeHidden?: 
     .from(products)
     .where(conditions.length ? and(...conditions) : undefined)
     .orderBy(asc(products.sortOrder), asc(products.createdAt));
-  return rows.map(fromRow);
+  return rows.map(fromRow).map(withExampleImage);
 }
 
 export async function getFeaturedProducts() {
@@ -105,11 +105,14 @@ export async function getFeaturedProducts() {
 
 /** A visible product by slug (hidden products 404 on the site). */
 export async function getProduct(slug: string, opts?: { includeHidden?: boolean }) {
-  if (!dbEnabled()) return sampleProducts.find((p) => p.slug === slug) ?? null;
+  if (!dbEnabled()) {
+    const p = sampleProducts.find((s) => s.slug === slug);
+    return p ? withExampleImage(p) : null;
+  }
   const d = await db();
   const [row] = await d.select().from(products).where(eq(products.slug, slug));
   if (!row || (row.hidden && !opts?.includeHidden)) return null;
-  return fromRow(row);
+  return withExampleImage(fromRow(row));
 }
 
 export async function getProductById(id: string) {

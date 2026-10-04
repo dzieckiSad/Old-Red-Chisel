@@ -63,6 +63,9 @@ export function ContentEditor({
           <Field label="Google Maps link" error={errors.mapsHref} hint="Google Maps → Share → Copy link.">
             <input name="mapsHref" defaultValue={contact.mapsHref} className={`${adminInput} text-sm`} />
           </Field>
+          <Field label="Facebook page" error={errors.facebook} hint="Facebook → your page → Share → Copy link. Empty = no Facebook link on the site.">
+            <input name="facebook" defaultValue={contact.facebook} className={`${adminInput} text-sm`} />
+          </Field>
         </Box>
 
         <Box title="Home page" hint="The first thing visitors read.">

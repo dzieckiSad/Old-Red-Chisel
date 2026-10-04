@@ -14,6 +14,8 @@ export type SiteContent = {
     county: string;
     hours: string;
     mapsHref: string;
+    /** Facebook page link. Empty = not shown. */
+    facebook: string;
   };
   surveyFee: number; // EUR, deducted from the order
   quoteResponseHours: number;
@@ -38,6 +40,7 @@ export const defaultContent: SiteContent = {
     county: "Co. Westmeath",
     hours: "Mon – Fri, 9:00 – 17:30",
     mapsHref: "https://maps.app.goo.gl/boCn4FWCBCWbT2wEA?g_st=ic",
+    facebook: "https://www.facebook.com/share/1BrLMLQpPV/",
   },
   surveyFee: 75,
   quoteResponseHours: 48,
@@ -57,12 +60,16 @@ export const defaultContent: SiteContent = {
   servicePrices: {},
 };
 
+/** An Irish phone number in international form, e.g. 089 492 8771 → +353894928771. */
+export function intlPhone(phone: string) {
+  const digits = phone.replace(/[^\d+]/g, "");
+  return digits.startsWith("+") ? digits : digits.startsWith("00") ? `+${digits.slice(2)}` : digits.startsWith("0") ? `+353${digits.slice(1)}` : `+${digits}`;
+}
+
 /** Links built from the contact details. */
 export function contactLinks(c: SiteContent["contact"]) {
-  const digits = c.phone.replace(/[^\d+]/g, "");
-  const intl = digits.startsWith("+") ? digits : digits.startsWith("0") ? `+353${digits.slice(1)}` : `+${digits}`;
   return {
-    phoneHref: `tel:${intl}`,
+    phoneHref: `tel:${intlPhone(c.phone)}`,
     whatsappHref: `https://wa.me/${c.whatsapp.replace(/\D/g, "")}`,
     address: [c.street, c.locality, c.county].filter(Boolean).join(", "),
   };

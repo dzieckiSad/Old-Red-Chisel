@@ -30,12 +30,14 @@ export async function saveSiteContent(_prev: ContentFormState, f: FormData): Pro
     county: str(f, "county", 80),
     hours: str(f, "hours", 120),
     mapsHref: str(f, "mapsHref", 500),
+    facebook: str(f, "facebook", 500),
   };
   if (!/\d{6,}/.test(contact.phone.replace(/\D/g, ""))) fieldErrors.phone = "Enter a phone number.";
   if (contact.whatsapp.length < 9) fieldErrors.whatsapp = "Digits only, with the country code: 353 and the number without the first 0.";
   if (!/^\S+@\S+\.\S+$/.test(contact.email)) fieldErrors.email = "Enter a valid email.";
   if (!contact.locality) fieldErrors.locality = "Enter the town.";
   if (contact.mapsHref && !/^https:\/\//.test(contact.mapsHref)) fieldErrors.mapsHref = "Paste the full link, starting with https://";
+  if (contact.facebook && !/^https:\/\/(www\.|m\.)?(facebook|fb)\.com\//.test(contact.facebook)) fieldErrors.facebook = "Paste the link to your Facebook page, starting with https://www.facebook.com/";
 
   const surveyFee = euro(str(f, "surveyFee", 10));
   if (surveyFee === null || Number.isNaN(surveyFee)) fieldErrors.surveyFee = "Enter the survey fee in euro, e.g. 75.";

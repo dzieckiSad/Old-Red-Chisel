@@ -1,15 +1,17 @@
 import "server-only";
+import { mkdir } from "node:fs/promises";
 import { sql } from "drizzle-orm";
+import { dataDir, isServerless } from "@/lib/runtime";
 import * as schema from "./schema";
 
-// Production: Neon Postgres (DATABASE_URL, added by Vercel's Neon integration).
-// Local development without DATABASE_URL: an embedded Postgres (PGlite) stored in .data/.
+// With DATABASE_URL: any PostgreSQL (Neon is reached over HTTP, anything else over a normal
+// connection). Without it: an embedded PostgreSQL (PGlite) in the data directory (DATA_DIR).
 
 type Db = Awaited<ReturnType<typeof connect>>;
 
 /**
- * DATABASE_URL, or the same variable under a custom prefix chosen when connecting Neon in
- * Vercel (e.g. ORCstorage_URL or ORCstorage_DATABASE_URL). Direct, unpooled URLs are skipped.
+ * DATABASE_URL, or the same variable under a custom prefix some hosts add (e.g. ORCstorage_URL or
+ * ORCstorage_DATABASE_URL). Direct, unpooled URLs are skipped.
  */
 export function databaseUrl() {
   if (process.env.DATABASE_URL) return process.env.DATABASE_URL;
@@ -22,18 +24,26 @@ export function databaseUrl() {
 
 async function connect() {
   const url = databaseUrl();
-  if (url) {
+  if (url && new URL(url).hostname.endsWith(".neon.tech")) {
     const { neon } = await import("@neondatabase/serverless");
     const { drizzle } = await import("drizzle-orm/neon-http");
     return drizzle({ client: neon(url), schema });
   }
-  if (process.env.VERCEL) {
-    throw new Error("DATABASE_URL is not set. Connect a Neon database to the Vercel project.");
+  type NeonDb = ReturnType<typeof import("drizzle-orm/neon-http").drizzle<typeof schema>>;
+  if (url) {
+    const { Pool } = await import("pg");
+    const { drizzle } = await import("drizzle-orm/node-postgres");
+    return drizzle({ client: new Pool({ connectionString: url, max: 5 }), schema }) as unknown as NeonDb;
+  }
+  if (isServerless()) {
+    throw new Error("DATABASE_URL is not set. This host doesn't keep files, so it needs an external PostgreSQL.");
   }
   const { PGlite } = await import("@electric-sql/pglite");
   const { drizzle } = await import("drizzle-orm/pglite");
-  const client = new PGlite(process.env.PGLITE_DIR ?? ".data/pglite");
-  return drizzle({ client, schema }) as unknown as ReturnType<typeof import("drizzle-orm/neon-http").drizzle<typeof schema>>;
+  const dir = process.env.PGLITE_DIR ?? `${dataDir()}/pglite`;
+  await mkdir(dir, { recursive: true });
+  const client = new PGlite(dir);
+  return drizzle({ client, schema }) as unknown as NeonDb;
 }
 
 const globalForDb = globalThis as unknown as { orcDb?: Promise<Db> };
@@ -52,7 +62,7 @@ export function getDb(): Promise<Db> {
 }
 
 export function isDatabaseConfigured() {
-  return Boolean(databaseUrl()) || !process.env.VERCEL;
+  return Boolean(databaseUrl()) || !isServerless();
 }
 
 export { schema };

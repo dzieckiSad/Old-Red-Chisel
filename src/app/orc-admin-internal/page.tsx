@@ -23,6 +23,9 @@ export default async function AdminHome() {
   const d = await getDashboard();
   const change = d.lastMonth.total ? Math.round(((d.thisMonth.total - d.lastMonth.total) / d.lastMonth.total) * 100) : null;
   const attention = [
+    ...(d.newQuotes
+      ? [{ href: `${base}/quotes?show=new`, text: `${d.newQuotes} new quote ${d.newQuotes === 1 ? "request" : "requests"} to answer` }]
+      : []),
     ...d.lowStock.map((p) => ({
       href: `${base}/products/${p.id}`,
       text: p.stock === 0 ? `${p.name} is sold out` : `${p.name}: last one in stock`,

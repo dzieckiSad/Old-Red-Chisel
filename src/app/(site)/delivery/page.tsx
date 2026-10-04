@@ -23,7 +23,8 @@ export default async function DeliveryPage() {
         intro="We deliver with our own van, so your piece arrives with the people who made it. Assembly is optional."
       />
       <Container className="py-12">
-        <div className="overflow-x-auto border border-line bg-white">
+        {/* Table on wider screens, one card per zone on phones. */}
+        <div className="hidden border border-line bg-white sm:block">
           <table className="w-full text-left text-sm">
             <thead className="border-b border-line bg-sand/60">
               <tr>
@@ -39,12 +40,32 @@ export default async function DeliveryPage() {
                   <td className="p-4 font-medium">{z.name}</td>
                   <td className="p-4 text-graphite">{z.area}</td>
                   <td className="p-4">{price(z.delivery)}</td>
-                  <td className="p-4">{z.name === "Workshop collection" ? "—" : price(z.assembly)}</td>
+                  <td className="p-4">{z.delivery === 0 ? "—" : price(z.assembly)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+        <ul className="space-y-3 sm:hidden">
+          {deliveryZones.map((z) => (
+            <li key={z.name} className="border border-line bg-white p-4 text-sm">
+              <p className="font-semibold text-ink">{z.name}</p>
+              <p className="text-graphite">{z.area}</p>
+              <dl className="mt-2 grid grid-cols-2 gap-2">
+                <div>
+                  <dt className="text-xs text-graphite">Delivery</dt>
+                  <dd className="font-semibold">{price(z.delivery)}</dd>
+                </div>
+                {z.delivery !== 0 && (
+                  <div>
+                    <dt className="text-xs text-graphite">Assembly</dt>
+                    <dd className="font-semibold">{price(z.assembly)}</dd>
+                  </div>
+                )}
+              </dl>
+            </li>
+          ))}
+        </ul>
         <p className="mt-4 text-sm text-graphite">
           Prices include VAT. Large pieces and kitchens are always delivered and fitted by our team as part of the quote.
         </p>

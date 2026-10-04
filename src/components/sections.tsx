@@ -3,6 +3,7 @@ import { type IconName, SketchIcon } from "@/components/sketch/icons";
 import { CornerMarks, PencilNote } from "@/components/sketch/ornaments";
 import { Reveal } from "@/components/sketch/reveal";
 import { ButtonLink, Container, PhotoPlaceholder } from "@/components/ui";
+import { NewTag } from "@/components/new-tag";
 import { ProductPhoto } from "@/components/product-photo";
 import { type Product, currentPrice, isSoldOut, modeLabels, onSale } from "@/lib/catalog";
 import { formatPrice } from "@/lib/format";
@@ -28,6 +29,11 @@ export function ProductCard({ product }: { product: Product }) {
             }`}
           >
             {badge}
+          </span>
+        )}
+        {product.isNew && (
+          <span className="absolute top-9 right-1.5 sm:top-2.5 sm:right-2">
+            <NewTag />
           </span>
         )}
       </div>

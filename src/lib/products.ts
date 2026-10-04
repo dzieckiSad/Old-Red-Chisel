@@ -31,6 +31,7 @@ function fromRow(r: Row): Product {
     options: r.options,
     images: r.images,
     featured: r.featured,
+    isNew: r.isNew,
     hidden: r.hidden,
     sortOrder: r.sortOrder,
   };
@@ -61,6 +62,7 @@ async function seeded() {
           stock: p.stock ?? null,
           options: p.options ?? [],
           featured: p.featured ?? false,
+          isNew: p.isNew ?? false,
           sortOrder: (i + 1) * 10,
         })),
       )
@@ -140,6 +142,7 @@ function toValues(p: ProductInput) {
     stock: p.stock ?? null,
     images: p.images ?? [],
     featured: p.featured ?? false,
+    isNew: p.isNew ?? false,
     hidden: p.hidden ?? false,
     sortOrder: p.sortOrder ?? 0,
     updatedAt: new Date(),

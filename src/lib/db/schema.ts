@@ -83,6 +83,8 @@ export const products = pgTable("products", {
   options: jsonb("options").$type<ProductOption[]>().notNull().default([]),
   images: jsonb("images").$type<ProductImage[]>().notNull().default([]),
   featured: boolean("featured").notNull().default(false),
+  /** Shown with a "New" tag and under "New in" in the shop. */
+  isNew: boolean("is_new").notNull().default(false),
   hidden: boolean("hidden").notNull().default(false),
   sortOrder: integer("sort_order").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -204,11 +206,13 @@ create table if not exists products (
   options jsonb not null default '[]',
   images jsonb not null default '[]',
   featured boolean not null default false,
+  is_new boolean not null default false,
   hidden boolean not null default false,
   sort_order integer not null default 0,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+alter table products add column if not exists is_new boolean not null default false;
 create index if not exists products_listing_idx on products (hidden, sort_order);
 create table if not exists projects (
   id uuid primary key default gen_random_uuid(),

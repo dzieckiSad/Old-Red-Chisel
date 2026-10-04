@@ -12,24 +12,33 @@ export const metadata: Metadata = {
 };
 
 export default async function ShopPage({ searchParams }: PageProps<"/shop">) {
-  const { category } = await searchParams;
+  const { category, show } = await searchParams;
   const active = typeof category === "string" ? getCategory(category) : undefined;
-  const products = await getProducts({ category: active?.slug });
+  const all = await getProducts();
+  const hasNew = all.some((p) => p.isNew);
+  const newOnly = show === "new" && hasNew;
+  const products = newOnly ? all.filter((p) => p.isNew) : active ? all.filter((p) => p.category === active.slug) : all;
 
   return (
     <>
       <PageHeader
         eyebrow="Shop"
-        title={active ? active.name : "Handmade pieces"}
+        title={newOnly ? "New in" : active ? active.name : "Handmade pieces"}
         intro="Ready to go or made to order in our Athlone workshop. Need a different size? We can make any piece to your measurements."
       />
       <Container className="py-12">
         <nav aria-label="Categories" className="flex flex-wrap gap-2">
-          <CategoryLink href="/shop" active={!active}>
+          <CategoryLink href="/shop" active={!active && !newOnly}>
             All
           </CategoryLink>
+          {hasNew && (
+            <CategoryLink href="/shop?show=new" active={newOnly}>
+              <span aria-hidden className={`mr-1.5 inline-block size-1.5 -translate-y-px rounded-full ${newOnly ? "bg-white" : "bg-brand"}`} />
+              New in
+            </CategoryLink>
+          )}
           {categories.map((c) => (
-            <CategoryLink key={c.slug} href={`/shop?category=${c.slug}`} active={active?.slug === c.slug}>
+            <CategoryLink key={c.slug} href={`/shop?category=${c.slug}`} active={!newOnly && active?.slug === c.slug}>
               {c.name}
             </CategoryLink>
           ))}

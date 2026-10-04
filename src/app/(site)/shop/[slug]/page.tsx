@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BuyBox } from "@/components/buy-box";
+import { NewTag } from "@/components/new-tag";
 import { ProductCard } from "@/components/sections";
 import { ProductGallery } from "@/components/product-gallery";
 import { Container, SectionHeading } from "@/components/ui";
@@ -48,6 +49,7 @@ export default async function ProductPage({ params }: PageProps<"/shop/[slug]">)
           </div>
 
           <div>
+            {product.isNew && <NewTag className="mb-3 ml-2" />}
             <h1 className="font-serif text-3xl font-semibold text-ink sm:text-4xl">{product.name}</h1>
             <p className="mt-3 text-lg text-graphite">{product.summary}</p>
 

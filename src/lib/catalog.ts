@@ -34,6 +34,8 @@ export type Product = {
   options?: ProductOption[];
   images?: ProductImage[];
   featured?: boolean;
+  /** Recently added: "New" tag and the "New in" filter in the shop. */
+  isNew?: boolean;
   hidden?: boolean;
   sortOrder?: number;
 };
@@ -178,6 +180,7 @@ export const sampleProducts: Product[] = [
     material: "Solid hardwood",
     leadTime: "Made to order in 3–5 weeks",
     options: [woodOptions, finishOptions],
+    isNew: true,
   },
   {
     slug: "floating-shelves",
@@ -205,6 +208,7 @@ export const sampleProducts: Product[] = [
     material: "Oak end grain, food-safe oil",
     leadTime: "Ready to ship in 2–5 working days",
     stock: 12,
+    isNew: true,
   },
 ];
 

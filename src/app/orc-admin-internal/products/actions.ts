@@ -101,6 +101,7 @@ export async function saveProduct(_prev: ProductFormState, f: FormData): Promise
     stock: mode === "in_stock" ? stock : null,
     images,
     featured: f.get("featured") === "on",
+    isNew: f.get("isNew") === "on",
     hidden: f.get("hidden") === "on",
   };
 

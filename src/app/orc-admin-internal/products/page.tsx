@@ -39,6 +39,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps<"/or
                 {p.name}
                 {p.hidden && <span className="ml-2 bg-ink/10 px-1.5 py-0.5 text-[11px] font-semibold uppercase">Hidden</span>}
                 {p.featured && <span className="ml-2 bg-oak/20 px-1.5 py-0.5 text-[11px] font-semibold uppercase">Featured</span>}
+                {p.isNew && <span className="ml-2 border border-brand px-1.5 py-0.5 text-[11px] font-semibold text-brand uppercase">New</span>}
                 {onSale(p) && <span className="ml-2 bg-brand px-1.5 py-0.5 text-[11px] font-semibold text-white uppercase">Sale</span>}
               </span>
               <span className="text-sm text-graphite">

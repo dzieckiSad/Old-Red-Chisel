@@ -188,6 +188,7 @@ export function ProductEditor({ product }: { product?: Product }) {
 
         <Box title="Visibility">
           <Check name="featured" defaultChecked={product?.featured} label="Feature on the home page" />
+          <Check name="isNew" defaultChecked={product?.isNew} label="Mark as new" hint="Shows a “New” tag and lists it under “New in” in the shop." />
           <Check name="hidden" defaultChecked={product?.hidden} label="Hide from the shop" hint="Keeps the product but takes it off the site." />
         </Box>
 
